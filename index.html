@@ -7,43 +7,88 @@
 <title>合约雷达 Safari</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#090d14;color:#eef3f8;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC",sans-serif}
-main{max-width:760px;margin:auto;padding:18px 14px 40px}.head{display:flex;justify-content:space-between;align-items:center}
-h1{margin:4px 0;font-size:27px}.muted{color:#8995a5}.small{font-size:12px}.status{font-size:12px;padding:7px 10px;border-radius:99px;background:#182230}
-.online{color:#58e39a}.offline{color:#ff7381}.card{background:#111823;border:1px solid #202b3a;border-radius:18px;padding:15px;margin:11px 0}
-button{width:100%;border:0;border-radius:14px;padding:14px;background:#f1f4f7;color:#090d14;font-size:16px;font-weight:800;margin:12px 0}
-.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.coin{font-size:18px;font-weight:800}.price{font-size:24px;font-weight:800;margin:8px 0}
-.badge{padding:5px 9px;border-radius:99px;font-size:12px;font-weight:800}.long{color:#58e39a;background:#123226}.short{color:#ff7381;background:#381c24}.wait{color:#ffd166;background:#342b16}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.box{background:#0b111a;border-radius:12px;padding:10px}.lab{font-size:11px;color:#788698}.val{font-size:14px;font-weight:700;margin-top:4px}
-.reason{font-size:13px;line-height:1.6;color:#b8c2cf;margin-top:12px}.empty{text-align:center;padding:35px 10px;color:#8995a5}
+main{max-width:760px;margin:auto;padding:18px 14px 40px}
+.head{display:flex;justify-content:space-between;align-items:center}
+h1{margin:4px 0;font-size:27px}.muted{color:#8995a5}.small{font-size:12px}
+.status{font-size:12px;padding:7px 10px;border-radius:99px;background:#182230}
+.online{color:#58e39a}.offline{color:#ff7381}
+.card{background:#111823;border:1px solid #202b3a;border-radius:18px;padding:15px;margin:11px 0}
+button{border:0;border-radius:14px;padding:12px 14px;font-size:15px;font-weight:700;cursor:pointer}
+.btn-main{width:100%;background:#f1f4f7;color:#090d14;margin:12px 0}
+.btn-add{background:#1a2a3a;color:#7ec8ff;font-size:13px;padding:8px 12px;margin-top:10px}
+.btn-del{background:#2a1a1a;color:#ff8a8a;font-size:12px;padding:6px 10px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.coin{font-size:18px;font-weight:800}.price{font-size:24px;font-weight:800;margin:8px 0}
+.badge{padding:5px 9px;border-radius:99px;font-size:12px;font-weight:800}
+.long{color:#58e39a;background:#123226}.short{color:#ff7381;background:#381c24}
+.wait{color:#ffd166;background:#342b16}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.box{background:#0b111a;border-radius:12px;padding:10px}
+.lab{font-size:11px;color:#788698}.val{font-size:14px;font-weight:700;margin-top:4px}
+.reason{font-size:13px;line-height:1.6;color:#b8c2cf;margin-top:12px}
+.empty{text-align:center;padding:35px 10px;color:#8995a5}
+.section-title{font-size:16px;font-weight:800;margin:22px 0 8px;display:flex;align-items:center;gap:8px}
 .footer{font-size:11px;color:#707d8e;line-height:1.6;margin-top:18px}
+.monitor-status{font-size:13px;margin-top:8px;padding:6px 10px;border-radius:10px;display:inline-block}
+.st-ok{background:#123226;color:#58e39a}
+.st-warn{background:#342b16;color:#ffd166}
+.st-fail{background:#381c24;color:#ff7381}
+.st-tp{background:#1a2a3a;color:#7ec8ff}
+.history{opacity:.75;border-style:dashed}
 </style>
 </head>
 <body>
 <main>
-<div class="head"><div><h1>⚡ 合约雷达</h1><div class="muted small">WEEX USDT 永续 · Safari 实时扫描</div></div><div id="conn" class="status offline">未连接</div></div>
-<button onclick="start()">▶ 开始扫描</button>
-<div id="summary" class="card"><b>等待启动</b><div class="small muted">打开后点击“开始扫描”，网页保持前台即可实时运行。</div></div>
+<div class="head">
+  <div>
+    <h1>⚡ 合约雷达</h1>
+    <div class="muted small">WEEX USDT 永续 · Safari 实时扫描</div>
+  </div>
+  <div id="conn" class="status offline">未连接</div>
+</div>
+
+<button class="btn-main" onclick="start()">▶ 开始扫描</button>
+
+<div class="section-title">🔎 实时扫描区 <span class="muted small">（自动更新，最多5个）</span></div>
+<div id="summary" class="card"><b>等待启动</b><div class="small muted">点击“开始扫描”后，系统每约30秒更新一次。</div></div>
 <div id="list"></div>
+
+<div class="section-title">⭐ 我的监控区 <span class="muted small">（手动加入，持续跟踪）</span></div>
+<div id="watchlist"></div>
+
+<div class="section-title">📋 历史记录</div>
+<div id="history"></div>
+
 <div class="footer">
 本版本只读取公开行情，不需要 WEEX API Key，也不会自动下单。<br>
 信号来自程序化技术结构筛选：1H → 15M → 5M。点位是模型计算的交易参考，不保证盈利。
 </div>
 </main>
+
 <script>
-const REST="https://contract-radar-proxy.2571941002.workers.dev/weex";
-let running=false, timer=null, symbols=[];
-const $=id=>document.getElementById(id);
+const REST = "https://contract-radar-proxy.2571941002.workers.dev/weex";
+let running = false, timer = null, symbols = [];
+const $ = id => document.getElementById(id);
+
+// 本地存储
+const WATCH_KEY = "contract_radar_watch";
+const HIST_KEY  = "contract_radar_hist";
+
+function loadWatch(){ try{return JSON.parse(localStorage.getItem(WATCH_KEY)||"[]")}catch{return[]} }
+function saveWatch(arr){ localStorage.setItem(WATCH_KEY, JSON.stringify(arr)) }
+function loadHist(){ try{return JSON.parse(localStorage.getItem(HIST_KEY)||"[]")}catch{return[]} }
+function saveHist(arr){ localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(0,30))) }
 
 async function get(path){
-  const r=await fetch(REST+path,{cache:"no-store"});
+  const r = await fetch(REST + path, {cache:"no-store"});
   if(!r.ok) throw Error(r.status);
   return r.json();
 }
 function num(x){return Number(x)}
 function fmt(x){
-  if(x==null||!isFinite(x))return "—";
-  if(Math.abs(x)>=1000)return x.toFixed(1);
-  if(Math.abs(x)>=10)return x.toFixed(3);
+  if(x==null||!isFinite(x)) return "—";
+  if(Math.abs(x)>=1000) return x.toFixed(1);
+  if(Math.abs(x)>=10) return x.toFixed(3);
   return x.toFixed(5);
 }
 function sma(a,n){if(a.length<n)return null;let s=0;for(let i=a.length-n;i<a.length;i++)s+=a[i];return s/n}
@@ -64,17 +109,15 @@ function levels(k){
   return {hi,lo};
 }
 async function candles(sym,interval){
-  // v3: /capi/v3/market/klines  interval 用小写 1h / 15m / 5m
-  const d=await get(`/capi/v3/market/klines?symbol=${encodeURIComponent(sym)}&interval=${interval}&limit=100`);
-  const arr=Array.isArray(d)?d:(d.data||[]);
+  const d = await get(`/capi/v3/market/klines?symbol=${encodeURIComponent(sym)}&interval=${interval}&limit=100`);
+  const arr = Array.isArray(d)?d:(d.data||[]);
   return arr.map(x=>({t:num(x[0]),o:num(x[1]),h:num(x[2]),l:num(x[3]),c:num(x[4]),v:num(x[5])})).sort((a,b)=>a.t-b.t);
 }
-function signal(sym, price,k1,k15,k5){
+function signal(sym, price, k1, k15, k5){
   const t1=trend(k1), t15=trend(k15), L=levels(k15), A=atr(k5)||Math.abs(price*.005);
-  const c5=k5.slice(-8), recentHi=Math.max(...c5.map(x=>x.h)), recentLo=Math.min(...c5.map(x=>x.l));
   let dir="观望", score=0, entry=[null,null], sl=null, tp=[];
-  if(t1==="偏多")score+=1;if(t1==="偏空")score-=1;
-  if(t15==="偏多")score+=2;if(t15==="偏空")score-=2;
+  if(t1==="偏多")score+=1; if(t1==="偏空")score-=1;
+  if(t15==="偏多")score+=2; if(t15==="偏空")score-=2;
   if(price>L.hi*0.998 && t15==="偏多")score+=1;
   if(price<L.lo*1.002 && t15==="偏空")score-=1;
   if(score>=3){
@@ -88,63 +131,202 @@ function signal(sym, price,k1,k15,k5){
     if(sl<=entry[1]) sl=entry[1]+A;
     let risk=sl-entry[0]; tp=[entry[0]-risk*1.3,entry[0]-risk*2,entry[0]-risk*2.8];
   }
-  const rr=dir==="观望"?"—":(dir==="做多"?((tp[1]-entry[1])/(entry[1]-sl)):((entry[0]-tp[1])/(sl-entry[0])));
-  return {sym,price,dir,score,t1,t15,entry,sl,tp,rr,atr:A,hi:L.hi,lo:L.lo,recentHi,recentLo};
+  const rr = dir==="观望"?"—":(dir==="做多"?((tp[1]-entry[1])/(entry[1]-sl)):((entry[0]-tp[1])/(sl-entry[0])));
+  return {sym,price,dir,score,t1,t15,entry,sl,tp,rr,hi:L.hi,lo:L.lo};
 }
 async function one(sym){
-  const [k1,k15,k5]=await Promise.all([candles(sym,"1h"),candles(sym,"15m"),candles(sym,"5m")]);
-  const ticker=await get(`/capi/v3/market/symbolPrice?symbol=${encodeURIComponent(sym)}`);
-  const price=num(ticker.price ?? ticker.data?.price);
+  const [k1,k15,k5] = await Promise.all([candles(sym,"1h"),candles(sym,"15m"),candles(sym,"5m")]);
+  const ticker = await get(`/capi/v3/market/symbolPrice?symbol=${encodeURIComponent(sym)}`);
+  const price = num(ticker.price ?? ticker.data?.price);
   return signal(sym,price,k1,k15,k5);
 }
 async function loadSymbols(){
-  // v3 用 exchangeInfo 拿全部合约
-  const d=await get("/capi/v3/market/exchangeInfo");
-  const a=d.symbols || (Array.isArray(d)?d:(d.data||[]));
-  symbols=a.map(x=>x.symbol||x.contractCode).filter(Boolean).filter(s=>/USDT$/i.test(s)).slice(0,80);
+  const d = await get("/capi/v3/market/exchangeInfo");
+  const a = d.symbols || (Array.isArray(d)?d:(d.data||[]));
+  symbols = a.map(x=>x.symbol||x.contractCode).filter(Boolean).filter(s=>/USDT$/i.test(s)).slice(0,80);
 }
-async function start(){
-  if(running)return;
-  running=true;$("conn").textContent="连接中…";$("conn").className="status";
-  try{
-    await loadSymbols(); $("conn").textContent="已连接";$("conn").className="status online";
-    await scan();
-    timer=setInterval(scan,15000);
-  }catch(e){
-    $("conn").textContent="连接失败";$("conn").className="status offline";
-    $("summary").innerHTML=`<b>连接失败</b><div class="small muted">${e.message}<br>如果代理或网络有问题，请检查 Cloudflare Worker 是否正常。</div>`;
-  }
-}
+
+/* ========== 实时扫描 ========== */
 async function scan(){
-  $("summary").innerHTML=`<b>🔎 扫描中…</b><div class="small muted">正在检查 ${symbols.length} 个 USDT 永续</div>`;
-  let out=[];
+  $("summary").innerHTML = `<b>🔎 扫描中…</b><div class="small muted">正在检查 ${symbols.length} 个 USDT 永续</div>`;
+  let out = [];
   for(let i=0;i<symbols.length;i+=5){
-    const batch=symbols.slice(i,i+5);
-    const r=await Promise.allSettled(batch.map(one));
-    r.forEach(x=>{if(x.status==="fulfilled"&&x.value)out.push(x.value)});
+    const batch = symbols.slice(i,i+5);
+    const r = await Promise.allSettled(batch.map(one));
+    r.forEach(x=>{if(x.status==="fulfilled"&&x.value) out.push(x.value)});
   }
   out.sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
-  const best=out.filter(x=>x.dir!=="观望").slice(0,5);
-  $("summary").innerHTML=`<b>🟢 扫描完成</b><div class="small muted">更新时间：${new Date().toLocaleTimeString()} · 有效信号 ${best.length} 个</div>`;
-  if(!best.length){$("list").innerHTML='<div class="card empty">当前没有达到 A 级以上结构的机会。<br>先观望，不硬凑单。</div>';return}
-  $("list").innerHTML=best.map(x=>{
-    const cls=x.dir==="做多"?"long":"short";
-    const rating=Math.abs(x.score)>=5?"S":Math.abs(x.score)>=4?"A":"B";
+  const best = out.filter(x=>x.dir!=="观望").slice(0,5);
+  $("summary").innerHTML = `<b>🟢 扫描完成</b><div class="small muted">更新时间：${new Date().toLocaleTimeString()} · 有效信号 ${best.length} 个</div>`;
+  if(!best.length){
+    $("list").innerHTML = '<div class="card empty">当前没有达到 A 级以上结构的机会。<br>先观望，不硬凑单。</div>';
+    return;
+  }
+  $("list").innerHTML = best.map(x=>{
+    const cls = x.dir==="做多"?"long":"short";
+    const rating = Math.abs(x.score)>=5?"S":Math.abs(x.score)>=4?"A":"B";
+    const already = loadWatch().some(w=>w.sym===x.sym && w.dir===x.dir);
     return `<div class="card">
       <div class="row"><span class="coin">${x.sym}</span><span class="badge ${cls}">${x.dir} · ${rating}</span></div>
       <div class="price">${fmt(x.price)}</div>
       <div class="grid">
-       <div class="box"><div class="lab">入场区</div><div class="val">${fmt(x.entry[0])} ～ ${fmt(x.entry[1])}</div></div>
-       <div class="box"><div class="lab">止损</div><div class="val">${fmt(x.sl)}</div></div>
-       <div class="box"><div class="lab">TP1</div><div class="val">${fmt(x.tp[0])}</div></div>
-       <div class="box"><div class="lab">TP2</div><div class="val">${fmt(x.tp[1])}</div></div>
-       <div class="box"><div class="lab">TP3</div><div class="val">${fmt(x.tp[2])}</div></div>
-       <div class="box"><div class="lab">盈亏比</div><div class="val">约 1 : ${x.rr.toFixed(2)}</div></div>
+        <div class="box"><div class="lab">入场区</div><div class="val">${fmt(x.entry[0])} ～ ${fmt(x.entry[1])}</div></div>
+        <div class="box"><div class="lab">止损</div><div class="val">${fmt(x.sl)}</div></div>
+        <div class="box"><div class="lab">TP1</div><div class="val">${fmt(x.tp[0])}</div></div>
+        <div class="box"><div class="lab">TP2</div><div class="val">${fmt(x.tp[1])}</div></div>
+        <div class="box"><div class="lab">TP3</div><div class="val">${fmt(x.tp[2])}</div></div>
+        <div class="box"><div class="lab">盈亏比</div><div class="val">约 1 : ${x.rr.toFixed(2)}</div></div>
       </div>
-      <div class="reason">1H：${x.t1}　15M：${x.t15}<br>压力：${fmt(x.hi)}　支撑：${fmt(x.lo)}<br>逻辑：趋势 + 关键位 + 5M波动过滤。进场前等待价格真正进入入场区，并确认结构没有失效。</div>
+      <div class="reason">1H：${x.t1}　15M：${x.t15}<br>压力：${fmt(x.hi)}　支撑：${fmt(x.lo)}</div>
+      ${already ? '<div class="small muted" style="margin-top:8px">已在监控中</div>' :
+        `<button class="btn-add" onclick='addWatch(${JSON.stringify(x)})'>＋ 加入自选监控</button>`}
     </div>`;
   }).join("");
 }
+
+/* ========== 我的监控 ========== */
+function addWatch(sig){
+  let list = loadWatch();
+  if(list.some(w=>w.sym===sig.sym && w.dir===sig.dir)) return;
+  list.push({
+    ...sig,
+    addedAt: Date.now(),
+    status: "监控中",
+    hitTP1: false, hitTP2: false, hitTP3: false
+  });
+  saveWatch(list);
+  renderWatch();
+}
+
+function removeWatch(sym, dir){
+  let list = loadWatch().filter(w=>!(w.sym===sym && w.dir===dir));
+  saveWatch(list);
+  renderWatch();
+}
+
+function moveToHist(item, reason){
+  let hist = loadHist();
+  hist.unshift({...item, endReason: reason, endedAt: Date.now()});
+  saveHist(hist);
+  removeWatch(item.sym, item.dir);
+  renderHist();
+}
+
+async function checkWatch(){
+  const list = loadWatch();
+  if(!list.length){ renderWatch(); return; }
+
+  for(let item of list){
+    try{
+      const ticker = await get(`/capi/v3/market/symbolPrice?symbol=${encodeURIComponent(item.sym)}`);
+      const price = num(ticker.price ?? ticker.data?.price);
+      item.price = price;
+
+      // 止损
+      if(item.dir==="做多" && price <= item.sl){
+        moveToHist(item, "🛑 止损触发");
+        continue;
+      }
+      if(item.dir==="做空" && price >= item.sl){
+        moveToHist(item, "🛑 止损触发");
+        continue;
+      }
+
+      // 止盈
+      if(item.dir==="做多"){
+        if(!item.hitTP1 && price >= item.tp[0]){ item.hitTP1=true; item.status="✅ TP1"; }
+        if(!item.hitTP2 && price >= item.tp[1]){ item.hitTP2=true; item.status="✅ TP2"; }
+        if(!item.hitTP3 && price >= item.tp[2]){ item.hitTP3=true; item.status="✅ TP3"; moveToHist(item,"✅ 全部止盈"); continue; }
+      } else {
+        if(!item.hitTP1 && price <= item.tp[0]){ item.hitTP1=true; item.status="✅ TP1"; }
+        if(!item.hitTP2 && price <= item.tp[1]){ item.hitTP2=true; item.status="✅ TP2"; }
+        if(!item.hitTP3 && price <= item.tp[2]){ item.hitTP3=true; item.status="✅ TP3"; moveToHist(item,"✅ 全部止盈"); continue; }
+      }
+
+      // 结构失效（简单用当前趋势反转判断）
+      const [k1,k15] = await Promise.all([candles(item.sym,"1h"),candles(item.sym,"15m")]);
+      const t1=trend(k1), t15=trend(k15);
+      if(item.dir==="做多" && (t1==="偏空" || t15==="偏空") && price < item.entry[0]){
+        moveToHist(item, "⚠️ 策略失效（结构反转）");
+        continue;
+      }
+      if(item.dir==="做空" && (t1==="偏多" || t15==="偏多") && price > item.entry[1]){
+        moveToHist(item, "⚠️ 策略失效（结构反转）");
+        continue;
+      }
+
+      if(!item.hitTP1) item.status = "🟢 策略监控中";
+    }catch(e){}
+  }
+  saveWatch(list);
+  renderWatch();
+}
+
+function renderWatch(){
+  const list = loadWatch();
+  if(!list.length){
+    $("watchlist").innerHTML = '<div class="card empty">还没有加入监控的信号。<br>在实时扫描区点“＋ 加入自选监控”。</div>';
+    return;
+  }
+  $("watchlist").innerHTML = list.map(x=>{
+    const cls = x.dir==="做多"?"long":"short";
+    let stClass = "st-ok";
+    if(x.status.includes("失效")||x.status.includes("止损")) stClass="st-fail";
+    else if(x.status.includes("TP")) stClass="st-tp";
+    else if(x.status.includes("监控")) stClass="st-ok";
+    return `<div class="card">
+      <div class="row"><span class="coin">${x.sym}</span><span class="badge ${cls}">${x.dir}</span></div>
+      <div class="price">${fmt(x.price)}</div>
+      <div class="grid">
+        <div class="box"><div class="lab">入场区</div><div class="val">${fmt(x.entry[0])} ～ ${fmt(x.entry[1])}</div></div>
+        <div class="box"><div class="lab">止损</div><div class="val">${fmt(x.sl)}</div></div>
+        <div class="box"><div class="lab">TP1</div><div class="val">${fmt(x.tp[0])}</div></div>
+        <div class="box"><div class="lab">TP2</div><div class="val">${fmt(x.tp[1])}</div></div>
+      </div>
+      <div class="monitor-status ${stClass}">${x.status}</div>
+      <div style="margin-top:10px"><button class="btn-del" onclick="removeWatch('${x.sym}','${x.dir}')">移除监控</button></div>
+    </div>`;
+  }).join("");
+}
+
+function renderHist(){
+  const hist = loadHist();
+  if(!hist.length){
+    $("history").innerHTML = '<div class="card empty">暂无历史记录</div>';
+    return;
+  }
+  $("history").innerHTML = hist.map(x=>{
+    const cls = x.dir==="做多"?"long":"short";
+    return `<div class="card history">
+      <div class="row"><span class="coin">${x.sym}</span><span class="badge ${cls}">${x.dir}</span></div>
+      <div class="small muted">入场 ${fmt(x.entry[0])}～${fmt(x.entry[1])}　止损 ${fmt(x.sl)}</div>
+      <div class="monitor-status st-fail" style="margin-top:8px">${x.endReason||"已结束"}</div>
+    </div>`;
+  }).join("");
+}
+
+async function start(){
+  if(running) return;
+  running = true;
+  $("conn").textContent = "连接中…"; $("conn").className = "status";
+  try{
+    await loadSymbols();
+    $("conn").textContent = "已连接"; $("conn").className = "status online";
+    await scan();
+    await checkWatch();
+    timer = setInterval(async ()=>{
+      await scan();
+      await checkWatch();
+    }, 30000);
+  }catch(e){
+    $("conn").textContent = "连接失败"; $("conn").className = "status offline";
+    $("summary").innerHTML = `<b>连接失败</b><div class="small muted">${e.message}</div>`;
+  }
+}
+
+// 页面加载时先渲染已有监控和历史
+renderWatch();
+renderHist();
 </script>
 </body>
 </html>
