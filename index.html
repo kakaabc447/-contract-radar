@@ -30,7 +30,7 @@ button{width:100%;border:0;border-radius:14px;padding:14px;background:#f1f4f7;co
 </div>
 </main>
 <script>
-const REST="https://api-contract.weex.com";
+const REST="https://contract-radar-proxy.2571941002.workers.dev/weex";
 let running=false, timer=null, symbols=[];
 const $=id=>document.getElementById(id);
 
@@ -64,7 +64,8 @@ function levels(k){
   return {hi,lo};
 }
 async function candles(sym,interval){
-  const d=await get(`/capi/v2/market/candles?symbol=${encodeURIComponent(sym)}&granularity=${interval}&limit=100`);
+  // v3: /capi/v3/market/klines  interval 用小写 1h / 15m / 5m
+  const d=await get(`/capi/v3/market/klines?symbol=${encodeURIComponent(sym)}&interval=${interval}&limit=100`);
   const arr=Array.isArray(d)?d:(d.data||[]);
   return arr.map(x=>({t:num(x[0]),o:num(x[1]),h:num(x[2]),l:num(x[3]),c:num(x[4]),v:num(x[5])})).sort((a,b)=>a.t-b.t);
 }
@@ -72,7 +73,6 @@ function signal(sym, price,k1,k15,k5){
   const t1=trend(k1), t15=trend(k15), L=levels(k15), A=atr(k5)||Math.abs(price*.005);
   const c5=k5.slice(-8), recentHi=Math.max(...c5.map(x=>x.h)), recentLo=Math.min(...c5.map(x=>x.l));
   let dir="观望", score=0, entry=[null,null], sl=null, tp=[];
-  // Conservative structure scoring; avoids forced signals.
   if(t1==="偏多")score+=1;if(t1==="偏空")score-=1;
   if(t15==="偏多")score+=2;if(t15==="偏空")score-=2;
   if(price>L.hi*0.998 && t15==="偏多")score+=1;
@@ -92,15 +92,16 @@ function signal(sym, price,k1,k15,k5){
   return {sym,price,dir,score,t1,t15,entry,sl,tp,rr,atr:A,hi:L.hi,lo:L.lo,recentHi,recentLo};
 }
 async function one(sym){
-  const [k1,k15,k5]=await Promise.all([candles(sym,"1H"),candles(sym,"15m"),candles(sym,"5m")]);
-  const ticker=await get(`/capi/v2/market/ticker?symbol=${encodeURIComponent(sym)}`);
-  const price=num(ticker.lastPrice ?? ticker.data?.lastPrice);
+  const [k1,k15,k5]=await Promise.all([candles(sym,"1h"),candles(sym,"15m"),candles(sym,"5m")]);
+  const ticker=await get(`/capi/v3/market/symbolPrice?symbol=${encodeURIComponent(sym)}`);
+  const price=num(ticker.price ?? ticker.data?.price);
   return signal(sym,price,k1,k15,k5);
 }
 async function loadSymbols(){
-  const d=await get("/capi/v2/market/contracts");
-  const a=Array.isArray(d)?d:(d.data||[]);
-  symbols=a.map(x=>x.symbol||x.contractCode).filter(Boolean).filter(s=>/USDT/i.test(s)).slice(0,80);
+  // v3 用 exchangeInfo 拿全部合约
+  const d=await get("/capi/v3/market/exchangeInfo");
+  const a=d.symbols || (Array.isArray(d)?d:(d.data||[]));
+  symbols=a.map(x=>x.symbol||x.contractCode).filter(Boolean).filter(s=>/USDT$/i.test(s)).slice(0,80);
 }
 async function start(){
   if(running)return;
@@ -111,7 +112,7 @@ async function start(){
     timer=setInterval(scan,15000);
   }catch(e){
     $("conn").textContent="连接失败";$("conn").className="status offline";
-    $("summary").innerHTML=`<b>连接失败</b><div class="small muted">${e.message}<br>如果 WEEX 在当前网络阻止跨域请求，需要把同一套前端放到支持代理的网页托管环境。</div>`;
+    $("summary").innerHTML=`<b>连接失败</b><div class="small muted">${e.message}<br>如果代理或网络有问题，请检查 Cloudflare Worker 是否正常。</div>`;
   }
 }
 async function scan(){
