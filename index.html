@@ -1,412 +1,1432 @@
+
+
 <!doctype html>
+
 <html lang="zh-CN">
+
 <head>
+
 <meta charset="utf-8">
+
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
 <meta name="theme-color" content="#090d14">
+
 <title>合约雷达 Safari</title>
+
 <style>
+
 *{box-sizing:border-box}body{margin:0;background:#090d14;color:#eef3f8;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC",sans-serif}
+
 main{max-width:760px;margin:auto;padding:18px 14px 40px}
+
 .head{display:flex;justify-content:space-between;align-items:center}
+
 h1{margin:4px 0;font-size:27px}.muted{color:#8995a5}.small{font-size:12px}
+
 .status{font-size:12px;padding:7px 10px;border-radius:99px;background:#182230}
+
 .online{color:#58e39a}.offline{color:#ff7381}
+
 .card{background:#111823;border:1px solid #202b3a;border-radius:18px;padding:15px;margin:11px 0}
+
 button{border:0;border-radius:14px;padding:12px 14px;font-size:15px;font-weight:700;cursor:pointer}
+
 .btn-main{width:100%;background:#f1f4f7;color:#090d14;margin:12px 0}
+
 .btn-add{background:#1a2a3a;color:#7ec8ff;font-size:13px;padding:8px 12px;margin-top:10px}
+
 .btn-del{background:#2a1a1a;color:#ff8a8a;font-size:12px;padding:6px 10px}
+
 .mode-switch{display:flex;gap:8px;margin:12px 0}
+
 .mode-btn{flex:1;background:#182230;color:#8995a5;padding:10px;border-radius:12px;font-size:14px}
+
 .mode-btn.active{background:#f1f4f7;color:#090d14}
+
 .row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+
 .coin{font-size:18px;font-weight:800}.price{font-size:24px;font-weight:800;margin:8px 0}
+
 .badge{padding:5px 9px;border-radius:99px;font-size:12px;font-weight:800}
+
 .long{color:#58e39a;background:#123226}.short{color:#ff7381;background:#381c24}
+
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
 .box{background:#0b111a;border-radius:12px;padding:10px}
+
 .lab{font-size:11px;color:#788698}.val{font-size:14px;font-weight:700;margin-top:4px}
+
 .reason{font-size:13px;line-height:1.6;color:#b8c2cf;margin-top:12px}
+
 .empty{text-align:center;padding:35px 10px;color:#8995a5}
+
 .section-title{font-size:16px;font-weight:800;margin:22px 0 8px;display:flex;align-items:center;gap:8px}
+
 .footer{font-size:11px;color:#707d8e;line-height:1.6;margin-top:18px}
+
 .monitor-status{font-size:13px;margin-top:8px;padding:6px 10px;border-radius:10px;display:inline-block}
+
 .st-ok{background:#123226;color:#58e39a}
+
 .st-fail{background:#381c24;color:#ff7381}
+
 .st-tp{background:#1a2a3a;color:#7ec8ff}
+
 .history{opacity:.75;border-style:dashed}
+
 .tag{font-size:11px;padding:3px 7px;border-radius:6px;background:#1a2a3a;color:#7ec8ff;margin-left:6px}
+
 .lev{font-size:12px;color:#ffd166;margin-top:6px}
+
+.invalid-card{border:1px solid #ff596b;box-shadow:0 0 0 1px #ff596b33}
+
+.alert-banner{display:none;background:#381c24;border:1px solid #ff596b;color:#ff9aa4;padding:12px;border-radius:12px;margin:10px 0;font-weight:800;line-height:1.5}
+
+.alert-banner.show{display:block}
+
+.btn-secondary{width:100%;background:#1a2a3a;color:#7ec8ff;margin:8px 0}
+
+.metric{font-size:20px;font-weight:800}
+
+.warning{color:#ffd166;line-height:1.6}
+
+.review-item{border-top:1px solid #202b3a;padding-top:10px;margin-top:10px}
+
 </style>
+
 </head>
+
 <body>
+
 <main>
+
 <div class="head">
+
   <div>
+
     <h1>⚡ 合约雷达</h1>
+
     <div class="muted small">WEEX USDT 永续 · Safari 实时扫描</div>
+
   </div>
+
   <div id="conn" class="status offline">未连接</div>
+
 </div>
 
 <div class="mode-switch">
+
   <button class="mode-btn active" id="mode-short" onclick="setMode('short')">短线（多币）</button>
+
   <button class="mode-btn" id="mode-intra" onclick="setMode('intra')">日内（BTC/ETH/SOL）</button>
+
 </div>
 
-<button class="btn-main" onclick="start()">▶ 开始扫描</button>
+<button class="btn-main" id="start-btn" onclick="start()">▶ 开始扫描</button>
+
+<div id="alert-banner" class="alert-banner" role="alert"></div>
 
 <div class="section-title">🔎 实时扫描区 <span class="muted small">（自动更新）</span></div>
+
 <div id="summary" class="card"><b>等待启动</b><div class="small muted">选择模式后点击“开始扫描”。</div></div>
+
 <div id="list"></div>
 
 <div class="section-title">⭐ 我的监控区 <span class="muted small">（手动加入，持续跟踪）</span></div>
+
 <div id="watchlist"></div>
 
+<div class="section-title">📈 历史回测（最近30天）</div>
+
+<div class="card">
+
+  <div class="small muted">仅回测当前“我的监控区”里的币种。回测会使用历史 K 线逐步生成信号，不用未来 K 线决定进场；行情接口可能限制历史数据长度。</div>
+
+  <button class="btn-secondary" id="backtest-btn" onclick="runBacktest()">▶ 回测监控币种（最近30天）</button>
+
+  <div id="backtest-summary" class="small muted">尚未运行回测</div>
+
+  <div id="backtest-results"></div>
+
+</div>
+
+<div class="section-title">🧠 策略失效复盘</div>
+
+<div id="review-area" class="card"><div class="small muted">策略失效后会自动记录原因与复盘建议；是否调整规则由你决定。</div></div>
+
 <div class="section-title">📋 历史记录</div>
+
 <div id="history"></div>
 
 <div class="footer">
+
 本版本只读取公开行情，不需要 WEEX API Key，也不会自动下单。<br>
-短线：1H→15M→5M（多币）　｜　日内：4H→1H→15M（仅 BTC / ETH / SOL）。没有合适点位就空仓观望。
+
+短线：1H→15M→5M（多币）　｜　日内：4H→1H→15M（仅 BTC / ETH / SOL）。没有合适点位就空仓观望。<br>
+
+监控区的价格触及止损/止盈只代表行情触及该价位，不代表真实订单成交；策略失效会留在监控区标红，需手动移除。
+
 </div>
+
 </main>
 
 <script>
+
 const REST = "https://contract-radar-proxy.2571941002.workers.dev/weex";
+
 let running = false, timer = null, symbols = [];
-let mode = "short";
+
+let mode = "short", scanBusy = false, watchBusy = false;
+
 const $ = id => document.getElementById(id);
 
 const INTRA_SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT"];
 
 const WATCH_KEY = "contract_radar_watch";
+
 const HIST_KEY  = "contract_radar_hist";
 
 function loadWatch(){ try{return JSON.parse(localStorage.getItem(WATCH_KEY)||"[]")}catch{return[]} }
+
 function saveWatch(arr){ localStorage.setItem(WATCH_KEY, JSON.stringify(arr)) }
+
 function loadHist(){ try{return JSON.parse(localStorage.getItem(HIST_KEY)||"[]")}catch{return[]} }
+
 function saveHist(arr){ localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(0,30))) }
 
 function setMode(m){
+
+  if(m!=="short" && m!=="intra") return;
+
   mode = m;
+
   $("mode-short").classList.toggle("active", m==="short");
+
   $("mode-intra").classList.toggle("active", m==="intra");
-  if(running){ scan(); }
+
+  if(running) runScanCycle(true);
+
 }
 
 async function get(path){
+
   const r = await fetch(REST + path, {cache:"no-store"});
-  if(!r.ok) throw Error(r.status);
+
+  if(!r.ok) throw Error("行情接口请求失败（HTTP "+r.status+"）");
+
   return r.json();
-}
-function num(x){return Number(x)}
-function fmt(x){
-  if(x==null||!isFinite(x)) return "—";
-  if(Math.abs(x)>=1000) return x.toFixed(1);
-  if(Math.abs(x)>=10) return x.toFixed(3);
-  return x.toFixed(5);
-}
-function sma(a,n){if(a.length<n)return null;let s=0;for(let i=a.length-n;i<a.length;i++)s+=a[i];return s/n}
-function atr(k,n=14){
-  if(k.length<n+1)return null; let trs=[];
-  for(let i=1;i<k.length;i++){let h=k[i].h,l=k[i].l,pc=k[i-1].c;trs.push(Math.max(h-l,Math.abs(h-pc),Math.abs(l-pc)))}
-  return sma(trs,n)
-}
-function trend(k){
-  if(k.length<30)return "数据不足";
-  let c=k.map(x=>x.c), a=sma(c,9), b=sma(c,21), last=c[c.length-1];
-  if(a>b && last>a)return "偏多";
-  if(a<b && last<a)return "偏空";
-  return "震荡";
-}
-function levels(k){
-  let n=Math.min(40,k.length), a=k.slice(-n), hi=Math.max(...a.map(x=>x.h)), lo=Math.min(...a.map(x=>x.l));
-  return {hi,lo};
-}
-async function candles(sym,interval){
-  const d = await get(`/capi/v3/market/klines?symbol=${encodeURIComponent(sym)}&interval=${interval}&limit=100`);
-  const arr = Array.isArray(d)?d:(d.data||[]);
-  return arr.map(x=>({t:num(x[0]),o:num(x[1]),h:num(x[2]),l:num(x[3]),c:num(x[4]),v:num(x[5])})).sort((a,b)=>a.t-b.t);
+
 }
 
-// 建议杠杆
+function num(x){return Number(x)}
+
+function fmt(x){
+
+  if(x==null||!isFinite(x)) return "—";
+
+  if(Math.abs(x)>=1000) return x.toFixed(1);
+
+  if(Math.abs(x)>=10) return x.toFixed(3);
+
+  return x.toFixed(5);
+
+}
+
+function sma(a,n){if(a.length<n)return null;let s=0;for(let i=a.length-n;i<a.length;i++)s+=a[i];return s/n}
+
+function atr(k,n=14){
+
+  if(k.length<n+1)return null; let trs=[];
+
+  for(let i=1;i<k.length;i++){let h=k[i].h,l=k[i].l,pc=k[i-1].c;trs.push(Math.max(h-l,Math.abs(h-pc),Math.abs(l-pc)))}
+
+  return sma(trs,n)
+
+}
+
+function trend(k){
+
+  if(k.length<30)return "数据不足";
+
+  let c=k.map(x=>x.c), a=sma(c,9), b=sma(c,21), last=c[c.length-1];
+
+  if(a>b && last>a)return "偏多";
+
+  if(a<b && last<a)return "偏空";
+
+  return "震荡";
+
+}
+
+function levels(k){
+
+  let n=Math.min(40,k.length), a=k.slice(-n), hi=Math.max(...a.map(x=>x.h)), lo=Math.min(...a.map(x=>x.l));
+
+  return {hi,lo};
+
+}
+
+async function candles(sym,interval,limit=100){
+
+  const d = await get(`/capi/v3/market/klines?symbol=${encodeURIComponent(sym)}&interval=${interval}&limit=${limit}`);
+
+  const arr = Array.isArray(d)?d:(d.data||[]);
+
+  return arr.map(x=>({t:num(x[0]),o:num(x[1]),h:num(x[2]),l:num(x[3]),c:num(x[4]),v:num(x[5])})).sort((a,b)=>a.t-b.t);
+
+}
+
 function suggestLeverage(sym, atrPct){
+
   const s = sym.replace("USDT","");
+
   if(s === "BTC" || s === "ETH") return atrPct > 1.5 ? "5～7x" : "6～8x";
+
   if(s === "SOL" || s === "BNB" || s === "XRP" || s === "ADA" || s === "DOGE" || s === "AVAX" || s === "LINK"){
+
     return atrPct > 2.5 ? "3～4x" : "3～5x";
+
   }
-  // 其他高波动币
+
   return atrPct > 3 ? "2～3x" : "2～4x";
+
 }
 
 function signal(sym, price, kHigh, kMid, kLow, modeLabel){
+
   const tH = trend(kHigh), tM = trend(kMid), L = levels(kMid), A = atr(kLow)||Math.abs(price*.005);
+
   let dir = "观望", score = 0, entry = [null,null], sl = null, tp = [];
 
-  // 高周期和中周期必须同向
   if(tH === "偏多" && tM === "偏多") score += 3;
+
   else if(tH === "偏空" && tM === "偏空") score -= 3;
+
   else return {sym,price,dir:"观望",score:0,tH,tM,entry,sl,tp,rr:"—",hi:L.hi,lo:L.lo,mode:modeLabel,lev:"—"};
 
   if(price > L.hi * 0.998 && tM === "偏多") score += 1;
+
   if(price < L.lo * 1.002 && tM === "偏空") score -= 1;
 
   const need = mode === "intra" ? 4 : 3;
+
   const atrPct = (A / price) * 100;
 
   if(score >= need){
+
     dir = "做多";
+
     let e1 = Math.max(L.hi, price - A * 0.35), e2 = price;
+
     entry = [Math.min(e1,e2), Math.max(e1,e2)];
+
     sl = Math.min(L.lo - A * 0.25, price - A * 1.15);
+
     if(sl >= entry[0]) sl = entry[0] - A;
+
     let risk = entry[1] - sl;
 
-    // 短线收紧止盈，日内稍宽
-    if(mode === "short"){
-      tp = [entry[1] + risk * 0.9, entry[1] + risk * 1.4, entry[1] + risk * 1.9];
-    } else {
-      tp = [entry[1] + risk * 1.2, entry[1] + risk * 1.8, entry[1] + risk * 2.4];
-    }
+    tp = mode === "short"
+
+      ? [entry[1] + risk * 0.6, entry[1] + risk * 0.9, entry[1] + risk * 1.2]
+
+      : [entry[1] + risk * 0.8, entry[1] + risk * 1.2, entry[1] + risk * 1.6];
+
   } else if(score <= -need){
+
     dir = "做空";
+
     let e1 = Math.min(L.lo, price + A * 0.35), e2 = price;
+
     entry = [Math.min(e1,e2), Math.max(e1,e2)];
+
     sl = Math.max(L.hi + A * 0.25, price + A * 1.15);
+
     if(sl <= entry[1]) sl = entry[1] + A;
+
     let risk = sl - entry[0];
 
-    if(mode === "short"){
-      tp = [entry[0] - risk * 0.9, entry[0] - risk * 1.4, entry[0] - risk * 1.9];
-    } else {
-      tp = [entry[0] - risk * 1.2, entry[0] - risk * 1.8, entry[0] - risk * 2.4];
-    }
+    tp = mode === "short"
+
+      ? [entry[0] - risk * 0.6, entry[0] - risk * 0.9, entry[0] - risk * 1.2]
+
+      : [entry[0] - risk * 0.8, entry[0] - risk * 1.2, entry[0] - risk * 1.6];
+
   }
 
   const rr = dir === "观望" ? "—" : (dir === "做多" ? ((tp[1]-entry[1])/(entry[1]-sl)) : ((entry[0]-tp[1])/(sl-entry[0])));
+
   const lev = dir === "观望" ? "—" : suggestLeverage(sym, atrPct);
 
   return {sym,price,dir,score,tH,tM,entry,sl,tp,rr,hi:L.hi,lo:L.lo,mode:modeLabel,lev};
-}
+
+} 
+
+  
 
 async function one(sym){
-  let kHigh, kMid, kLow, modeLabel;
-  if(mode === "short"){
-    [kHigh, kMid, kLow] = await Promise.all([candles(sym,"1h"), candles(sym,"15m"), candles(sym,"5m")]);
-    modeLabel = "短线";
-  } else {
-    [kHigh, kMid, kLow] = await Promise.all([candles(sym,"4h"), candles(sym,"1h"), candles(sym,"15m")]);
-    modeLabel = "日内";
+
+  let kHigh,kMid,kLow,modeLabel;
+
+  if(mode==="short"){
+
+    [kHigh,kMid,kLow]=await Promise.all([
+
+      candles(sym,"1h"),candles(sym,"15m"),candles(sym,"5m")
+
+    ]);
+
+    modeLabel="短线";
+
+  }else{
+
+    [kHigh,kMid,kLow]=await Promise.all([
+
+      candles(sym,"4h"),candles(sym,"1h"),candles(sym,"15m")
+
+    ]);
+
+    modeLabel="日内";
+
   }
-  const ticker = await get(`/capi/v3/market/symbolPrice?symbol=${encodeURIComponent(sym)}`);
-  const price = num(ticker.price ?? ticker.data?.price);
-  return signal(sym, price, kHigh, kMid, kLow, modeLabel);
+
+  const ticker=await get(`/capi/v3/market/symbolPrice?symbol=${encodeURIComponent(sym)}`);
+
+  const price=num(ticker.price??ticker.data?.price);
+
+  return signal(sym,price,kHigh,kMid,kLow,modeLabel);
+
 }
 
 async function loadSymbols(){
-  if(mode === "intra"){
-    symbols = INTRA_SYMBOLS;
-    return;
-  }
-  const d = await get("/capi/v3/market/exchangeInfo");
-  const a = d.symbols || (Array.isArray(d)?d:(d.data||[]));
-  symbols = a.map(x=>x.symbol||x.contractCode).filter(Boolean).filter(s=>/USDT$/i.test(s)).slice(0,80);
+
+  if(mode==="intra"){symbols=[...INTRA_SYMBOLS];return;}
+
+  const d=await get("/capi/v3/market/exchangeInfo");
+
+  const a=d.symbols||(Array.isArray(d)?d:(d.data||[]));
+
+  symbols=a.map(x=>x.symbol||x.contractCode)
+
+    .filter(Boolean).filter(s=>/USDT$/i.test(s)).slice(0,80);
+
 }
 
 async function scan(){
-  const modeText = mode === "short" ? "短线" : "日内";
-  $("summary").innerHTML = `<b>🔎 ${modeText}扫描中…</b><div class="small muted">正在检查 ${symbols.length} 个交易对</div>`;
-  let out = [];
-  for(let i=0; i<symbols.length; i+=5){
-    const batch = symbols.slice(i, i+5);
-    const r = await Promise.allSettled(batch.map(one));
-    r.forEach(x=>{ if(x.status==="fulfilled" && x.value) out.push(x.value) });
-  }
-  out.sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
-  const best = out.filter(x=>x.dir !== "观望").slice(0,5);
 
-  $("summary").innerHTML = `<b>🟢 ${modeText}扫描完成</b><div class="small muted">更新时间：${new Date().toLocaleTimeString()} · 有效信号 ${best.length} 个</div>`;
+  if(scanBusy)return;
 
-  if(!best.length){
-    $("list").innerHTML = `<div class="card empty">当前${modeText}模式没有达到标准的机会。<br>高周期与中周期必须同向，没有合适点位就空仓观望。</div>`;
-    return;
-  }
+  scanBusy=true;
 
-  $("list").innerHTML = best.map(x=>{
-    const cls = x.dir==="做多"?"long":"short";
-    const rating = Math.abs(x.score)>=5?"S":Math.abs(x.score)>=4?"A":"B";
-    const already = loadWatch().some(w=>w.sym===x.sym && w.dir===x.dir && w.mode===x.mode);
-    const logicText = mode === "short"
-      ? "逻辑：高周期与中周期趋势同向 + 关键位 + 5M波动过滤。进场前等待价格真正进入入场区，并确认结构没有失效。"
-      : "逻辑：4H与1H趋势同向 + 关键位 + 15M波动过滤。适合日内持仓，进场前等待价格真正进入入场区，并确认结构没有失效。";
-    return `<div class="card">
-      <div class="row">
-        <span class="coin">${x.sym}<span class="tag">${x.mode}</span></span>
-        <span class="badge ${cls}">${x.dir} · ${rating}</span>
-      </div>
-      <div class="price">${fmt(x.price)}</div>
-      <div class="grid">
-        <div class="box"><div class="lab">入场区</div><div class="val">${fmt(x.entry[0])} ～ ${fmt(x.entry[1])}</div></div>
-        <div class="box"><div class="lab">止损</div><div class="val">${fmt(x.sl)}</div></div>
-        <div class="box"><div class="lab">TP1</div><div class="val">${fmt(x.tp[0])}</div></div>
-        <div class="box"><div class="lab">TP2</div><div class="val">${fmt(x.tp[1])}</div></div>
-        <div class="box"><div class="lab">TP3</div><div class="val">${fmt(x.tp[2])}</div></div>
-        <div class="box"><div class="lab">盈亏比</div><div class="val">约 1 : ${x.rr.toFixed(2)}</div></div>
-      </div>
-      <div class="lev">建议杠杆：${x.lev}</div>
-      <div class="reason">
-        高周期：${x.tH}　中周期：${x.tM}<br>
-        压力：${fmt(x.hi)}　支撑：${fmt(x.lo)}<br>
-        ${logicText}
-      </div>
-      ${already ? '<div class="small muted" style="margin-top:8px">已在监控中</div>' :
-        `<button class="btn-add" onclick='addWatch(${JSON.stringify(x)})'>＋ 加入自选监控</button>`}
-    </div>`;
-  }).join("");
+  const scanMode=mode, scanSymbols=[...symbols];
+
+  const modeText=scanMode==="short"?"短线":"日内";
+
+  $("summary").innerHTML=`<b>🔎 ${modeText}扫描中…</b><div class="small muted">正在检查 ${scanSymbols.length} 个交易对</div>`;
+
+  try{
+
+    let out=[];
+
+    for(let i=0;i<scanSymbols.length;i+=5){
+
+      if(scanMode!==mode)return;
+
+      const batch=scanSymbols.slice(i,i+5);
+
+      const r=await Promise.allSettled(batch.map(one));
+
+      r.forEach(x=>{if(x.status==="fulfilled"&&x.value)out.push(x.value)});
+
+    }
+
+    if(scanMode!==mode)return;
+
+    out.sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+
+    const best=out.filter(x=>x.dir!=="观望").slice(0,5);
+
+    $("summary").innerHTML=`<b>🟢 ${modeText}扫描完成</b><div class="small muted">更新时间：${new Date().toLocaleTimeString()} · 有效信号 ${best.length} 个</div>`;
+
+    if(!best.length){
+
+      $("list").innerHTML=`<div class="card empty">当前${modeText}模式没有达到标准的机会。<br>高周期与中周期必须同向，没有合适点位就空仓观望。</div>`;
+
+      return;
+
+    }
+
+    $("list").innerHTML=best.map(x=>{
+
+      const cls=x.dir==="做多"?"long":"short";
+
+      const rating=Math.abs(x.score)>=5?"S":Math.abs(x.score)>=4?"A":"B";
+
+      const already=loadWatch().some(w=>w.sym===x.sym&&w.dir===x.dir&&w.mode===x.mode);
+
+      const logicText=scanMode==="short"
+
+        ?"逻辑：高周期与中周期趋势同向 + 关键位 + 5M波动过滤。进场前等待价格进入入场区，并确认结构没有失效。"
+
+        :"逻辑：4H与1H趋势同向 + 关键位 + 15M波动过滤。适合日内持仓，进场前等待价格进入入场区，并确认结构没有失效。";
+
+      return `<div class="card">
+
+        <div class="row"><span class="coin">${x.sym}<span class="tag">${x.mode}</span></span><span class="badge ${cls}">${x.dir} · ${rating}</span></div>
+
+        <div class="price">${fmt(x.price)}</div>
+
+        <div class="grid">
+
+          <div class="box"><div class="lab">入场区</div><div class="val">${fmt(x.entry[0])} ～ ${fmt(x.entry[1])}</div></div>
+
+          <div class="box"><div class="lab">止损</div><div class="val">${fmt(x.sl)}</div></div>
+
+          <div class="box"><div class="lab">TP1</div><div class="val">${fmt(x.tp[0])}</div></div>
+
+          <div class="box"><div class="lab">TP2</div><div class="val">${fmt(x.tp[1])}</div></div>
+
+          <div class="box"><div class="lab">TP3</div><div class="val">${fmt(x.tp[2])}</div></div>
+
+          <div class="box"><div class="lab">盈亏比</div><div class="val">约 1 : ${Number(x.rr).toFixed(2)}</div></div>
+
+        </div>
+
+        <div class="lev">参考杠杆：${x.lev}（非安全保证）</div>
+
+        <div class="reason">高周期：${x.tH}　中周期：${x.tM}<br>压力：${fmt(x.hi)}　支撑：${fmt(x.lo)}<br>${logicText}</div>
+
+        ${already?'<div class="small muted" style="margin-top:8px">已在监控中</div>':`<button class="btn-add" onclick='addWatch(${JSON.stringify(x)})'>＋ 加入自选监控</button>`}
+
+      </div>`;
+
+    }).join("");
+
+  }catch(e){
+
+    $("summary").innerHTML=`<b>扫描遇到问题</b><div class="small muted">${escapeHtml(e.message||"未知错误")}，请稍后重试。</div>`;
+
+  }finally{scanBusy=false;}
+
 }
 
 function addWatch(sig){
-  let list = loadWatch();
-  if(list.some(w=>w.sym===sig.sym && w.dir===sig.dir && w.mode===sig.mode)) return;
-  list.push({
-    ...sig,
-    addedAt: Date.now(),
-    status: "🟢 策略监控中",
-    hitTP1: false, hitTP2: false, hitTP3: false
-  });
-  saveWatch(list);
-  renderWatch();
+
+  let list=loadWatch();
+
+  if(list.some(w=>w.sym===sig.sym&&w.dir===sig.dir&&w.mode===sig.mode))return;
+
+  list.push({...sig,addedAt:Date.now(),status:"🟢 策略监控中",hitTP1:false,hitTP2:false,hitTP3:false,invalid:false});
+
+  saveWatch(list);renderWatch();
+
 }
 
-function removeWatch(sym, dir, mode){
-  let list = loadWatch().filter(w=>!(w.sym===sym && w.dir===dir && w.mode===mode));
-  saveWatch(list);
+function removeWatch(sym,dir,modeName){
+
+  saveWatch(loadWatch().filter(w=>!(w.sym===sym&&w.dir===dir&&w.mode===modeName)));
+
   renderWatch();
+
 }
 
-function moveToHist(item, reason){
-  let hist = loadHist();
-  hist.unshift({...item, endReason: reason, endedAt: Date.now()});
-  saveHist(hist);
-  removeWatch(item.sym, item.dir, item.mode);
-  renderHist();
+function moveToHist(item,reason){
+
+  const hist=loadHist();
+
+  hist.unshift({...item,endReason:reason,endedAt:Date.now()});
+
+  saveHist(hist);renderHist();
+
+}
+
+function markInvalid(item,reason,price){
+
+  if(item.invalid)return;
+
+  item.invalid=true;
+
+  item.invalidReason=reason;
+
+  item.invalidAt=Date.now();
+
+  item.invalidPrice=price;
+
+  item.status="🔴 策略已失效 · 请手动移除";
+
+  item.review={
+
+    reason,checkedAt:item.invalidAt,price,
+
+    suggestions:[
+
+      "检查入场时高周期与中周期是否真正同向，避免趋势切换时进场。",
+
+      "检查入场区是否靠近明显支撑或压力，是否追在行情末端。",
+
+      "对照失效前的高周期结构与 ATR 波动，评估是否需要等待收盘确认。",
+
+      "先将建议作为待验证假设；通过后续回测比较，不自动修改策略。"
+
+    ],
+
+    adopted:false
+
+  };
+
+  showAlert(`${item.sym} ${item.dir}策略失效：${reason}，当前价 ${fmt(price)}。已保留在监控区，请自行决定是否移除。`);
+
+}
+
+function showAlert(message){
+
+  const el=$("alert-banner");
+
+  el.textContent="⚠️ "+message;
+
+  el.classList.add("show");
+
+}
+
+function escapeHtml(s){
+
+  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
 }
 
 async function checkWatch(){
-  const list = loadWatch();
-  if(!list.length){ renderWatch(); return; }
 
-  for(let item of list){
-    try{
-      const ticker = await get(`/capi/v3/market/symbolPrice?symbol=${encodeURIComponent(item.sym)}`);
-      const price = num(ticker.price ?? ticker.data?.price);
-      item.price = price;
+  if(watchBusy)return;
 
-      if(item.dir==="做多" && price <= item.sl){ moveToHist(item, "🛑 止损触发"); continue; }
-      if(item.dir==="做空" && price >= item.sl){ moveToHist(item, "🛑 止损触发"); continue; }
+  watchBusy=true;
 
-      if(item.dir==="做多"){
-        if(!item.hitTP1 && price >= item.tp[0]){ item.hitTP1=true; item.status="✅ TP1"; }
-        if(!item.hitTP2 && price >= item.tp[1]){ item.hitTP2=true; item.status="✅ TP2"; }
-        if(!item.hitTP3 && price >= item.tp[2]){ item.hitTP3=true; item.status="✅ TP3"; moveToHist(item,"✅ 全部止盈"); continue; }
-      } else {
-        if(!item.hitTP1 && price <= item.tp[0]){ item.hitTP1=true; item.status="✅ TP1"; }
-        if(!item.hitTP2 && price <= item.tp[1]){ item.hitTP2=true; item.status="✅ TP2"; }
-        if(!item.hitTP3 && price <= item.tp[2]){ item.hitTP3=true; item.status="✅ TP3"; moveToHist(item,"✅ 全部止盈"); continue; }
-      }
+  try{
 
-      const midInterval = item.mode==="日内" ? "1h" : "15m";
-      const highInterval = item.mode==="日内" ? "4h" : "1h";
-      const [kH, kM] = await Promise.all([candles(item.sym, highInterval), candles(item.sym, midInterval)]);
-      const tH = trend(kH), tM = trend(kM);
-      if(item.dir==="做多" && (tH==="偏空" || tM==="偏空") && price < item.entry[0]){
-        moveToHist(item, "⚠️ 策略失效（结构反转）"); continue;
-      }
-      if(item.dir==="做空" && (tH==="偏多" || tM==="偏多") && price > item.entry[1]){
-        moveToHist(item, "⚠️ 策略失效（结构反转）"); continue;
-      }
+    const list=loadWatch();
 
-      if(!item.hitTP1) item.status = "🟢 策略监控中";
-    }catch(e){}
-  }
-  saveWatch(list);
-  renderWatch();
+    if(!list.length){renderWatch();return;}
+
+    let changed=false;
+
+    const endedKeys=new Set();
+
+    const keyOf=item=>`${item.sym}|${item.dir}|${item.mode||"短线"}`;
+
+    for(const item of list){
+
+      try{
+
+        const ticker=await get(`/capi/v3/market/symbolPrice?symbol=${encodeURIComponent(item.sym)}`);
+
+        const price=num(ticker.price??ticker.data?.price);
+
+        if(!Number.isFinite(price))continue;
+
+        item.price=price;item.lastCheckedAt=Date.now();changed=true;
+
+        if(item.invalid)continue;
+
+        if((item.dir==="做多"&&price<=item.sl)||(item.dir==="做空"&&price>=item.sl)){
+
+          item.status="🛑 行情触及止损价（未验证成交）";
+
+          moveToHist(item,item.status);
+
+          endedKeys.add(keyOf(item));continue;
+
+        }
+
+        if(item.dir==="做多"){
+
+          if(!item.hitTP1&&price>=item.tp[0]){item.hitTP1=true;item.status="✅ 行情触及 TP1";}
+
+          if(!item.hitTP2&&price>=item.tp[1]){item.hitTP2=true;item.status="✅ 行情触及 TP2";}
+
+          if(!item.hitTP3&&price>=item.tp[2]){
+
+            item.hitTP3=true;item.status="✅ 行情触及 TP3";
+
+            moveToHist(item,"✅ 行情触及 TP3（未验证成交）");
+
+            endedKeys.add(keyOf(item));continue;
+
+          }
+
+        }else{
+
+          if(!item.hitTP1&&price<=item.tp[0]){item.hitTP1=true;item.status="✅ 行情触及 TP1";}
+
+          if(!item.hitTP2&&price<=item.tp[1]){item.hitTP2=true;item.status="✅ 行情触及 TP2";}
+
+          if(!item.hitTP3&&price<=item.tp[2]){
+
+            item.hitTP3=true;item.status="✅ 行情触及 TP3";
+
+            moveToHist(item,"✅ 行情触及 TP3（未验证成交）");
+
+            endedKeys.add(keyOf(item));continue;
+
+          }
+
+        }
+
+        const midInterval=item.mode==="日内"?"1h":"15m";
+
+        const highInterval=item.mode==="日内"?"4h":"1h";
+
+        const [kH,kM]=await Promise.all([candles(item.sym,highInterval),candles(item.sym,midInterval)]);
+
+        const tH=trend(kH),tM=trend(kM);
+
+        if(item.dir==="做多"&&(tH==="偏空"||tM==="偏空")&&price<item.entry[0]){
+
+          markInvalid(item,"高周期或中周期转空，且价格跌破入场区",price);continue;
+
+        }
+
+        if(item.dir==="做空"&&(tH==="偏多"||tM==="偏多")&&price>item.entry[1]){
+
+          markInvalid(item,"高周期或中周期转多，且价格突破入场区",price);continue;
+
+        }
+
+        if(!item.hitTP1)item.status="🟢 策略监控中";
+
+      }catch(e){item.lastError=String(e.message||e);}
+
+    }
+
+    const remaining=list.filter(item=>!endedKeys.has(keyOf(item)));
+
+    if(changed||list.length)saveWatch(remaining);
+
+    renderWatch();
+
+  }finally{watchBusy=false;}
+
 }
 
 function renderWatch(){
-  const list = loadWatch();
+
+  const list=loadWatch();
+
   if(!list.length){
-    $("watchlist").innerHTML = '<div class="card empty">还没有加入监控的信号。<br>在实时扫描区点“＋ 加入自选监控”。</div>';
-    return;
+
+    $("watchlist").innerHTML='<div class="card empty">还没有加入监控的信号。<br>在实时扫描区点“＋ 加入自选监控”。</div>';return;
+
   }
-  $("watchlist").innerHTML = list.map(x=>{
-    const cls = x.dir==="做多"?"long":"short";
-    let stClass = "st-ok";
-    if(x.status.includes("失效")||x.status.includes("止损")) stClass="st-fail";
-    else if(x.status.includes("TP")) stClass="st-tp";
-    return `<div class="card">
-      <div class="row">
-        <span class="coin">${x.sym}<span class="tag">${x.mode||"短线"}</span></span>
-        <span class="badge ${cls}">${x.dir}</span>
-      </div>
+
+  $("watchlist").innerHTML=list.map(x=>{
+
+    const cls=x.dir==="做多"?"long":"short";
+
+    let stClass="st-ok";
+
+    if(x.invalid||(x.status||"").includes("失效")||(x.status||"").includes("止损"))stClass="st-fail";
+
+    else if((x.status||"").includes("TP"))stClass="st-tp";
+
+    return `<div class="card ${x.invalid?'invalid-card':''}">
+
+      <div class="row"><span class="coin">${x.sym}<span class="tag">${x.mode||"短线"}</span></span><span class="badge ${cls}">${x.dir}</span></div>
+
       <div class="price">${fmt(x.price)}</div>
+
       <div class="grid">
+
         <div class="box"><div class="lab">入场区</div><div class="val">${fmt(x.entry[0])} ～ ${fmt(x.entry[1])}</div></div>
+
         <div class="box"><div class="lab">止损</div><div class="val">${fmt(x.sl)}</div></div>
+
         <div class="box"><div class="lab">TP1</div><div class="val">${fmt(x.tp[0])}</div></div>
+
         <div class="box"><div class="lab">TP2</div><div class="val">${fmt(x.tp[1])}</div></div>
+
       </div>
-      <div class="lev">建议杠杆：${x.lev||"—"}</div>
-      <div class="monitor-status ${stClass}">${x.status}</div>
-      <div style="margin-top:10px"><button class="btn-del" onclick="removeWatch('${x.sym}','${x.dir}','${x.mode||"短线"}')">移除监控</button></div>
+
+      <div class="lev">参考杠杆：${x.lev||"—"}（非安全保证）</div>
+
+      <div class="monitor-status ${stClass}">${escapeHtml(x.status||"🟢 策略监控中")}</div>
+
+      ${x.invalid?`<div class="reason" style="color:#ff8a8a">失效原因：${escapeHtml(x.invalidReason||"策略条件不再成立")}<br>发现时间：${new Date(x.invalidAt||Date.now()).toLocaleString()}<br>失效时价格：${fmt(x.invalidPrice)}<br>该状态已锁定，不会因行情反弹自动恢复。</div>`:""}
+
+      ${x.lastError?`<div class="small muted">最近一次检查异常：${escapeHtml(x.lastError)}</div>`:""}
+
+      <div style="margin-top:10px"><button class="btn-del" onclick='removeWatch(${JSON.stringify(x.sym)},${JSON.stringify(x.dir)},${JSON.stringify(x.mode||"短线")})'>移除监控</button></div>
+
     </div>`;
+
   }).join("");
+
 }
 
 function renderHist(){
-  const hist = loadHist();
-  if(!hist.length){
-    $("history").innerHTML = '<div class="card empty">暂无历史记录</div>';
-    return;
-  }
-  $("history").innerHTML = hist.map(x=>{
-    const cls = x.dir==="做多"?"long":"short";
-    return `<div class="card history">
-      <div class="row">
-        <span class="coin">${x.sym}<span class="tag">${x.mode||"短线"}</span></span>
-        <span class="badge ${cls}">${x.dir}</span>
-      </div>
+
+  const hist=loadHist();
+
+  if(!hist.length){$("history").innerHTML='<div class="card empty">暂无历史记录</div>';return;}
+
+  renderReviews();
+
+  $("history").innerHTML=hist.map(x=>{
+
+    const cls=x.dir==="做多"?"long":"short";
+
+    return `<div class="card history"><div class="row"><span class="coin">${x.sym}<span class="tag">${x.mode||"短线"}</span></span><span class="badge ${cls}">${x.dir}</span></div>
+
       <div class="small muted">入场 ${fmt(x.entry[0])}～${fmt(x.entry[1])}　止损 ${fmt(x.sl)}</div>
-      <div class="monitor-status st-fail" style="margin-top:8px">${x.endReason||"已结束"}</div>
-    </div>`;
+
+      <div class="monitor-status st-fail" style="margin-top:8px">${escapeHtml(x.endReason||"已结束")}</div></div>`;
+
   }).join("");
+
+}
+
+  
+
+function renderReviews(){
+
+  const invalid=loadWatch().filter(x=>x.invalid && x.review);
+
+  const hist=loadHist().filter(x=>x.invalid || (x.endReason||"").includes("失效"));
+
+  const all=[
+
+    ...invalid,
+
+    ...hist.filter(h=>!invalid.some(w=>w.sym===h.sym&&w.invalidAt===h.invalidAt))
+
+  ].slice(0,10);
+
+  if(!all.length){
+
+    $("review-area").innerHTML='<div class="small muted">目前还没有策略失效记录。出现失效后，这里会展示原因和待验证的改进建议。</div>';
+
+    return;
+
+  }
+
+  $("review-area").innerHTML=all.map((x,i)=>{
+
+    const r=x.review||{
+
+      reason:x.invalidReason||x.endReason||"结构条件不再成立",
+
+      checkedAt:x.invalidAt||x.endedAt,
+
+      price:x.invalidPrice||x.price,
+
+      suggestions:[
+
+        "检查高周期与中周期方向是否一致。",
+
+        "检查入场位置是否接近关键支撑或压力。",
+
+        "检查失效前波动是否扩大，并通过回测验证改进。"
+
+      ],
+
+      adopted:false
+
+    };
+
+    return `<div class="review-item">
+
+      <b>${escapeHtml(x.sym)} · ${escapeHtml(x.dir||"")}</b>
+
+      <div class="small muted">
+
+        ${r.checkedAt?new Date(r.checkedAt).toLocaleString():"时间未知"}
+
+        · 失效价 ${fmt(r.price)}
+
+      </div>
+
+      <div class="reason">失效原因：${escapeHtml(r.reason)}</div>
+
+      <ul>${r.suggestions.map(t=>`<li class="small">${escapeHtml(t)}</li>`).join("")}</ul>
+
+      <button class="btn-secondary" onclick="toggleReviewAdopt(${i})">
+
+        ${r.adopted?"已标记采纳（不自动改策略）":"标记为我准备测试的改进方向"}
+
+      </button>
+
+      <input type="hidden" id="review-id-${i}" value="${escapeHtml(x.sym)}|${escapeHtml(x.dir||"")}|${r.checkedAt||0}">
+
+    </div>`;
+
+  }).join("");
+
+}
+
+function toggleReviewAdopt(index){
+
+  const node=$("review-id-"+index);
+
+  if(!node)return;
+
+  const [sym,dir,ts]=node.value.split("|");
+
+  const watch=loadWatch();
+
+  const item=watch.find(x=>
+
+    x.sym===sym &&
+
+    x.dir===dir &&
+
+    x.review &&
+
+    String(x.review.checkedAt)===ts
+
+  );
+
+  if(item){
+
+    item.review.adopted=!item.review.adopted;
+
+    saveWatch(watch);
+
+    renderReviews();
+
+    return;
+
+  }
+
+  alert("这条复盘来自历史记录；当前版本可以查看建议，但无法在历史条目上保存采纳状态。");
+
+}
+
+function simSignalAt(sym,modeName,hi,mid,low,price){
+
+  const prev=mode;
+
+  mode=modeName==="日内"?"intra":"short";
+
+  try{
+
+    return signal(sym,price,hi,mid,low,modeName);
+
+  }finally{
+
+    mode=prev;
+
+  }
+
+}
+
+async function fetchBacktestCandles(sym,interval){
+
+  // 尝试拉取最多1000根；如果数据不足，会在界面提示实际覆盖范围。
+
+  return candles(sym,interval,1000);
+
+}
+
+async function runBacktest(){
+
+  const btn=$("backtest-btn");
+
+  const summary=$("backtest-summary");
+
+  const results=$("backtest-results");
+
+  if(btn.disabled)return;
+
+  const watch=loadWatch();
+
+  const uniq=[
+
+    ...new Map(watch.map(x=>[x.sym+"|"+(x.mode||"短线"),x])).values()
+
+  ];
+
+  if(!uniq.length){
+
+    summary.innerHTML='<span class="warning">请先在监控区加入至少一个币种，再运行回测。</span>';
+
+    results.innerHTML="";
+
+    return;
+
+  }
+
+  btn.disabled=true;
+
+  btn.textContent="回测进行中…";
+
+  summary.textContent="正在请求历史 K 线。若遇到 HTTP 429 会停止本轮，稍后可重试。";
+
+  results.innerHTML="";
+
+  const since=Date.now()-30*24*60*60*1000;
+
+  const feeRate=0.0006;
+
+  const slippageRate=0.0003;
+
+  const rows=[];
+
+  let anyLimited=false;
+
+  try{
+
+    for(const w of uniq){
+
+      const m=w.mode||"短线";
+
+      const modeName=m==="日内"?"日内":"短线";
+
+      const intervals=modeName==="日内"
+
+        ?["4h","1h","15m"]
+
+        :["1h","15m","5m"];
+
+      let ks;
+
+      try{
+
+        ks=await Promise.all(
+
+          intervals.map(iv=>fetchBacktestCandles(w.sym,iv))
+
+        );
+
+      }catch(e){
+
+        if(String(e.message).includes("429"))anyLimited=true;
+
+        rows.push({sym:w.sym,mode:m,error:e.message});
+
+        continue;
+
+      }
+
+      const [kh,km,kl]=ks;
+
+      if(!kh||!km||!kl||Math.min(kh.length,km.length,kl.length)<35){
+
+        rows.push({
+
+          sym:w.sym,
+
+          mode:m,
+
+          error:`历史 K 线不足（${kh?.length||0}/${km?.length||0}/${kl?.length||0} 根），无法可靠回测。`
+
+        });
+
+        continue;
+
+      }
+
+      const low=kl.filter(k=>k.t>=since);
+
+      if(low.length<30){
+
+        rows.push({
+
+          sym:w.sym,
+
+          mode:m,
+
+          error:`可用低周期 K 线仅 ${low.length} 根，无法覆盖30天；接口可能只返回最近一段数据。`
+
+        });
+
+        continue;
+
+      }
+
+      const trades=[];
+
+      let open=null;
+
+      for(let i=30;i<low.length-1;i++){
+
+        const bar=low[i];
+
+        if(bar.t<since)continue;
+
+        if(open){
+
+          const next=low[i+1];
+
+          const isLong=open.dir==="做多";
+
+          const slHit=isLong?next.l<=open.sl:next.h>=open.sl;
+
+          const tpHit=isLong?next.h>=open.tp[2]:next.l<=open.tp[2];
+
+          if(slHit||tpHit){
+
+            // 同一根K线同时触及止损和止盈时，保守地按止损处理。
+
+            const exit=slHit?open.sl:open.tp[2];
+
+            const gross=isLong
+
+              ?(exit-open.entry)/open.entry
+
+              :(open.entry-exit)/open.entry;
+
+            const net=gross-2*(feeRate+slippageRate);
+
+            trades.push({
+
+              net,
+
+              ambiguous:slHit&&tpHit,
+
+              win:net>0
+
+            });
+
+            open=null;
+
+          }
+
+          continue;
+
+        }
+
+        const duration={
+
+          "1m":60000,
+
+          "5m":300000,
+
+          "15m":900000,
+
+          "1h":3600000,
+
+          "4h":14400000
+
+        };
+
+        // 只使用当前信号K线之前已经收盘的数据，避免未来数据泄漏。
+
+        const highCut=kh.filter(
+
+          k=>k.t+duration[intervals[0]]<=bar.t
+
+        );
+
+        const midCut=km.filter(
+
+          k=>k.t+duration[intervals[1]]<=bar.t
+
+        );
+
+        const lowCut=kl.filter(
+
+          k=>k.t+duration[intervals[2]]<=bar.t
+
+        );
+
+        if(highCut.length<30||midCut.length<30||lowCut.length<15)continue;
+
+        const sig=simSignalAt(
+
+          w.sym,
+
+          modeName,
+
+          highCut,
+
+          midCut,
+
+          lowCut,
+
+          bar.c
+
+        );
+
+        if(sig.dir==="观望"||!sig.sl||!sig.tp?.length)continue;
+
+        const next=low[i+1];
+
+        const inZone=next.l<=sig.entry[1]&&next.h>=sig.entry[0];
+
+        if(!inZone)continue;
+
+        open={
+
+          dir:sig.dir,
+
+          entry:(sig.entry[0]+sig.entry[1])/2,
+
+          sl:sig.sl,
+
+          tp:sig.tp
+
+        };
+
+      }
+
+      const wins=trades.filter(t=>t.win).length;
+
+      const losses=trades.length-wins;
+
+      const net=trades.reduce((a,t)=>a+t.net,0);
+
+      const amb=trades.filter(t=>t.ambiguous).length;
+
+      rows.push({
+
+        sym:w.sym,
+
+        mode:m,
+
+        trades:trades.length,
+
+        wins,
+
+        losses,
+
+        winRate:trades.length?wins/trades.length*100:0,
+
+        net,
+
+        ambiguous:amb,
+
+        coverageDays:(low[low.length-1].t-low[0].t)/86400000
+
+      });
+
+    }
+
+    const valid=rows.filter(r=>!r.error);
+
+    const total=valid.reduce((a,r)=>a+r.trades,0);
+
+    const wins=valid.reduce((a,r)=>a+r.wins,0);
+
+    const net=valid.reduce((a,r)=>a+r.net,0);
+
+    const amb=valid.reduce((a,r)=>a+r.ambiguous,0);
+
+    summary.innerHTML=`
+
+      <b>回测完成：${total} 笔模拟交易</b>
+
+      <div class="small muted">
+
+        合计胜率：${total?(wins/total*100).toFixed(1):"—"}%
+
+        · 估算净收益率合计：${(net*100).toFixed(2)}%
+
+        · 同K线止盈止损冲突：${amb} 笔
+
+      </div>
+
+      <div class="small warning">
+
+        手续费与滑点按每边 0.06% + 0.03% 的示例值估算，往返合计0.18%。
+
+        这不是交易所对你账户的确认费率，回测也不代表实盘收益。
+
+      </div>
+
+      ${anyLimited?'<div class="warning">接口返回 HTTP 429：触发限流。请稍后重试，避免连续点击。</div>':""}
+
+      <div class="small muted">
+
+        接口最多返回1000根K线时，部分币种可能无法覆盖完整30天；
+
+        以下逐币显示实际数据覆盖情况。未完成的最后一笔交易不计入统计。
+
+      </div>
+
+    `;
+
+    results.innerHTML=rows.map(r=>{
+
+      if(r.error){
+
+        return `<div class="card">
+
+          <b>${escapeHtml(r.sym)} · ${escapeHtml(r.mode)}</b>
+
+          <div class="reason warning">
+
+            数据不足/请求失败：${escapeHtml(r.error)}
+
+          </div>
+
+        </div>`;
+
+      }
+
+      return `<div class="card">
+
+        <div class="row">
+
+          <b>${escapeHtml(r.sym)} <span class="tag">${escapeHtml(r.mode)}</span></b>
+
+          <b>${r.trades} 笔</b>
+
+        </div>
+
+        <div class="grid">
+
+          <div class="box">
+
+            <div class="lab">胜率</div>
+
+            <div class="metric">${r.winRate.toFixed(1)}%</div>
+
+          </div>
+
+          <div class="box">
+
+            <div class="lab">估算净收益率合计</div>
+
+            <div class="metric">${(r.net*100).toFixed(2)}%</div>
+
+          </div>
+
+          <div class="box">
+
+            <div class="lab">盈利 / 亏损</div>
+
+            <div class="val">${r.wins} / ${r.losses}</div>
+
+          </div>
+
+          <div class="box">
+
+            <div class="lab">同K线冲突（按止损）</div>
+
+            <div class="val">${r.ambiguous}</div>
+
+          </div>
+
+        </div>
+
+        <div class="small muted">
+
+          实际数据覆盖约 ${r.coverageDays.toFixed(1)} 天。
+
+          ${r.coverageDays<29?"未覆盖完整30天，结果仅供参考。":"接近完整30天覆盖。"}
+
+        </div>
+
+      </div>`;
+
+    }).join("");
+
+  }catch(e){
+
+    summary.innerHTML=`
+
+      <span class="warning">
+
+        回测中断：${escapeHtml(e.message||"未知错误")}。
+
+        如为 HTTP 429，请等待后重试。
+
+      </span>`;
+
+  }finally{
+
+    btn.disabled=false;
+
+    btn.textContent="▶ 回测监控币种（最近30天）";
+
+  }
+
+}
+
+async function runScanCycle(reloadSymbols=false){
+
+  if(!running)return;
+
+  try{
+
+    if(reloadSymbols)await loadSymbols();
+
+    await scan();
+
+    await checkWatch();
+
+  }catch(e){
+
+    $("summary").innerHTML=`
+
+      <b>本轮更新失败</b>
+
+      <div class="small muted">
+
+        ${escapeHtml(e.message||"未知错误")}，下轮会继续尝试。
+
+      </div>`;
+
+  }
+
 }
 
 async function start(){
-  if(running) return;
-  running = true;
-  $("conn").textContent = "连接中…"; $("conn").className = "status";
+
+  if(running)return;
+
+  running=true;
+
+  $("start-btn").textContent="⏸ 正在监控（每30秒更新）";
+
+  $("conn").textContent="连接中…";
+
+  $("conn").className="status";
+
   try{
+
     await loadSymbols();
-    $("conn").textContent = "已连接"; $("conn").className = "status online";
-    await scan();
-    await checkWatch();
-    timer = setInterval(async ()=>{
-      await loadSymbols();
-      await scan();
-      await checkWatch();
-    }, 30000);
+
+    $("conn").textContent="已连接";
+
+    $("conn").className="status online";
+
+    await runScanCycle(false);
+
+    if(timer)clearInterval(timer);
+
+    timer=setInterval(()=>{runScanCycle(true);},30000);
+
   }catch(e){
-    $("conn").textContent = "连接失败"; $("conn").className = "status offline";
-    $("summary").innerHTML = `<b>连接失败</b><div class="small muted">${e.message}</div>`;
+
+    running=false;
+
+    $("start-btn").textContent="▶ 开始扫描";
+
+    $("conn").textContent="连接失败";
+
+    $("conn").className="status offline";
+
+    $("summary").innerHTML=`
+
+      <b>连接失败</b>
+
+      <div class="small muted">${escapeHtml(e.message||"未知错误")}</div>`;
+
   }
+
 }
 
 renderWatch();
+
 renderHist();
+
+renderReviews();
+
 </script>
+
 </body>
+
 </html>
+
+  
+  
