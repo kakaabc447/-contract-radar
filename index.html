@@ -1,96 +1,76 @@
-doctype html>
+<!DOCTYPE html>
 
 <html lang="zh-CN">
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 
-<meta name="theme-color" content="#090d14">
+<meta name="theme-color" content="#f4f6fb">
 
-<title>合约雷达 Safari</title>
+<title>Crypto Radar 行情雷达 · 指标验收版</title>
 
 <style>
 
-*{box-sizing:border-box}body{margin:0;background:#090d14;color:#eef3f8;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC",sans-serif}
+:root{--bg:#f4f6fb;--card:#fff;--text:#202944;--muted:#8b94aa;--blue:#4568ef;--green:#13a779;--red:#ed6272;--line:#edf0f7}
 
-main{max-width:760px;margin:auto;padding:18px 14px 40px}
+*{box-sizing:border-box}
 
-.head{display:flex;justify-content:space-between;align-items:center}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;padding-bottom:85px}
 
-h1{margin:4px 0;font-size:27px}.muted{color:#8995a5}.small{font-size:12px}
+button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.5}
 
-.status{font-size:12px;padding:7px 10px;border-radius:99px;background:#182230}
+.app{max-width:520px;margin:auto;padding:18px 15px 30px}
 
-.online{color:#58e39a}.offline{color:#ff7381}
+.top,.row,.section{display:flex;align-items:center;justify-content:space-between;gap:10px}
 
-.card{background:#111823;border:1px solid #202b3a;border-radius:18px;padding:15px;margin:11px 0}
+.top{margin:6px 2px 20px}.brand{display:flex;align-items:center;gap:10px}
 
-button{border:0;border-radius:14px;padding:12px 14px;font-size:15px;font-weight:700;cursor:pointer}
+.logo{width:42px;height:42px;border-radius:15px;background:linear-gradient(135deg,#4e7cff,#8e70ed);display:grid;place-items:center;color:white;font-size:23px}
 
-.btn-main{width:100%;background:#f1f4f7;color:#090d14;margin:12px 0}
+h1{font-size:18px;margin:0 0 4px}h2{font-size:16px;margin:0}.sub{color:var(--muted);font-size:11px}
 
-.btn-add{background:#1a2a3a;color:#7ec8ff;font-size:13px;padding:8px 12px;margin-top:10px}
+.pill{padding:7px 10px;border-radius:20px;font-size:11px;background:#f0f2f7;color:#7b8498;white-space:nowrap}.pill.ok{background:#e7f8f0;color:#15976d}.pill.err{background:#fff0f1;color:#dc5266}
 
-.btn-del{background:#2a1a1a;color:#ff8a8a;font-size:12px;padding:6px 10px}
+.card{background:var(--card);border-radius:21px;padding:17px;margin-bottom:13px;box-shadow:0 5px 22px #23355c08;border:1px solid white}
 
-.mode-switch{display:flex;gap:8px;margin:12px 0}
+.eyebrow{font-size:11px;color:var(--muted);letter-spacing:.5px}.big{font-size:29px;font-weight:800;letter-spacing:-1px;margin:7px 0;overflow-wrap:anywhere}
 
-.mode-btn{flex:1;background:#182230;color:#8995a5;padding:10px;border-radius:12px;font-size:14px}
+.muted{color:var(--muted)}.green{color:var(--green)}.red{color:var(--red)}.small{font-size:11px}
 
-.mode-btn.active{background:#f1f4f7;color:#090d14}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:19px}.stat{background:#f7f8fc;border-radius:13px;padding:11px 9px}.stat strong{display:block;font-size:16px;margin-top:7px}
 
-.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.btn{border:0;border-radius:12px;padding:11px 14px;background:var(--blue);color:white;font-weight:650}.btn.light{background:#eef1ff;color:var(--blue)}.btn.ghost{background:#f3f5fa;color:#69738a}.full{width:100%}
 
-.coin{font-size:18px;font-weight:800}.price{font-size:24px;font-weight:800;margin:8px 0}
+.toolbar{display:flex;gap:8px;align-items:center}.toolbar select,.toolbar input,select,input{min-width:0;padding:11px;border-radius:12px;border:1px solid var(--line);background:white;color:var(--text)}.toolbar select{flex:1;width:100%}.toolbar button{white-space:nowrap}
 
-.badge{padding:5px 9px;border-radius:99px;font-size:12px;font-weight:800}
+.note{background:#fff8e9;color:#95702b;padding:12px;border-radius:13px;font-size:11px;line-height:1.7;margin-top:12px}
 
-.long{color:#58e39a;background:#123226}.short{color:#ff7381;background:#381c24}
+.filters{display:flex;gap:8px;overflow:auto;padding:1px 0 5px}.filter{border:0;background:white;color:#79829a;border-radius:20px;padding:9px 14px;white-space:nowrap}.filter.active{background:#e9edff;color:var(--blue);font-weight:700}
 
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.coin{display:flex;align-items:center;gap:11px;padding:14px 0;border-bottom:1px solid var(--line)}.coin:last-child{border-bottom:0;padding-bottom:0}.coin:first-child{padding-top:0}
 
-.box{background:#0b111a;border-radius:12px;padding:10px}
+.coinicon{width:39px;height:39px;flex-shrink:0;border-radius:14px;display:grid;place-items:center;font-weight:800;background:#edf1ff;color:#4868e9;font-size:11px}
 
-.lab{font-size:11px;color:#788698}.val{font-size:14px;font-weight:700;margin-top:4px}
+.coinmain{flex:1;min-width:0}.coinmain strong{font-size:14px}.coinmain .muted{font-size:11px;margin-top:5px}.price{text-align:right;white-space:nowrap}.price strong{display:block;font-size:14px}.price small{display:block;margin-top:5px}
 
-.reason{font-size:13px;line-height:1.6;color:#b8c2cf;margin-top:12px}
+.tag{display:inline-block;padding:4px 7px;border-radius:7px;font-size:10px;font-weight:650;margin-top:6px}.tag.blue{background:#edf0ff;color:#5268db}.tag.green{background:#e7f8f0;color:#15976d}.tag.red{background:#fff0f1;color:#dc5266}.tag.gray{background:#f0f2f7;color:#7b8498}
 
-.empty{text-align:center;padding:35px 10px;color:#8995a5}
+.chartwrap{height:210px;margin-top:12px;position:relative}canvas{width:100%;height:100%;display:block}
 
-.section-title{font-size:16px;font-weight:800;margin:22px 0 8px;display:flex;align-items:center;gap:8px}
+.levels{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.level{padding:11px;border-radius:12px;background:#f7f8fc}.level strong{display:block;margin-top:6px;font-size:14px;overflow-wrap:anywhere}
 
-.footer{font-size:11px;color:#707d8e;line-height:1.6;margin-top:18px}
+.empty{padding:24px 8px;text-align:center;color:var(--muted);font-size:12px;line-height:1.8}
 
-.monitor-status{font-size:13px;margin-top:8px;padding:6px 10px;border-radius:10px;display:inline-block}
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:10;background:#ffffffed;backdrop-filter:blur(15px);border-top:1px solid var(--line);display:flex;justify-content:center;padding:9px 8px calc(9px + env(safe-area-inset-bottom))}
 
-.st-ok{background:#123226;color:#58e39a}
+.nav{display:flex;width:100%;max-width:520px;justify-content:space-around}.nav button{border:0;background:transparent;color:#8992a8;font-size:10px;padding:5px 14px}.nav button span{display:block;font-size:19px;margin-bottom:3px}.nav button.active{color:var(--blue);font-weight:700}
 
-.st-fail{background:#381c24;color:#ff7381}
+.toast{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);background:#252c40;color:white;padding:12px 17px;border-radius:13px;font-size:12px;z-index:30;max-width:85%;text-align:center}
 
-.st-tp{background:#1a2a3a;color:#7ec8ff}
-
-.history{opacity:.75;border-style:dashed}
-
-.tag{font-size:11px;padding:3px 7px;border-radius:6px;background:#1a2a3a;color:#7ec8ff;margin-left:6px}
-
-.lev{font-size:12px;color:#ffd166;margin-top:6px}
-
-.invalid-card{border:1px solid #ff596b;box-shadow:0 0 0 1px #ff596b33}
-
-.alert-banner{display:none;background:#381c24;border:1px solid #ff596b;color:#ff9aa4;padding:12px;border-radius:12px;margin:10px 0;font-weight:800;line-height:1.5}
-
-.alert-banner.show{display:block}
-
-.btn-secondary{width:100%;background:#1a2a3a;color:#7ec8ff;margin:8px 0}
-
-.metric{font-size:20px;font-weight:800}
-
-.warning{color:#ffd166;line-height:1.6}
-
-.review-item{border-top:1px solid #202b3a;padding-top:10px;margin-top:10px}
+@media(min-width:420px){.app{padding-left:19px;padding-right:19px}}
 
 </style>
 
@@ -98,1333 +78,686 @@ button{border:0;border-radius:14px;padding:12px 14px;font-size:15px;font-weight:
 
 <body>
 
-<main>
+<div class="app">
 
-<div class="head">
+<header class="top" id="home">
 
-  <div>
+  <div class="brand"><div class="logo">⌁</div><div><h1>Crypto Radar</h1><div class="sub">WEEX 合约行情雷达 · EMA20 / EMA50 / ATR14</div></div></div>
 
-    <h1>⚡ 合约雷达</h1>
+  <span class="pill" id="connection">● 正在连接</span>
 
-    <div class="muted small">WEEX USDT 永续 · Safari 实时扫描</div>
+</header>
+
+<section class="card">
+
+  <div class="row"><div class="eyebrow">RADAR OVERVIEW</div><span class="small muted" id="clock">--:--:--</span></div>
+
+  <div class="big">行情监控台</div><div class="sub">当前验证行情、K线完整性及技术指标，不生成交易信号</div>
+
+  <div class="stats">
+
+    <div class="stat"><span class="eyebrow">币种数量</span><strong id="count">0</strong></div>
+
+    <div class="stat"><span class="eyebrow">已加载</span><strong id="loadedCount">0</strong></div>
+
+    <div class="stat"><span class="eyebrow">指标状态</span><strong id="indicatorState">待验证</strong></div>
 
   </div>
 
-  <div id="conn" class="status offline">未连接</div>
+</section>
+
+<section class="card">
+
+  <div class="row"><div><div class="eyebrow">MARKET DATA</div><h2 style="margin-top:7px">市场数据</h2></div><span class="tag gray" id="scanState">等待加载</span></div>
+
+  <div class="toolbar" style="margin:13px 0">
+
+    <select id="timeframe" aria-label="图表周期">
+
+      <option value="5m">5分钟</option><option value="15m">15分钟</option><option value="1h">1小时</option><option value="4h">4小时</option><option value="1d">日线</option>
+
+    </select>
+
+  </div>
+
+  <div class="toolbar"><button class="btn full" id="refreshBtn">刷新数据</button><button class="btn light" id="verifyBtn">核验指标</button></div>
+
+  <div class="note" id="notice">只读取 WEEX 公开行情。本版本不生成多空方向、入场、止损或止盈建议。</div>
+
+</section>
+
+<div class="section"><h2>行情列表</h2><button class="btn light" id="addBtn">＋ 添加币种</button></div>
+
+<div class="filters" id="filters"><button class="filter active" data-filter="all">全部币种</button><button class="filter" data-filter="watch">已加载</button></div>
+
+<section class="card" id="coinList"><div class="empty">正在加载 WEEX 交易对…</div></section>
+
+<div class="section" id="detail"><h2>币种详情与指标核验</h2><select id="detailSelect" style="width:120px;padding:8px"></select></div>
+
+<section class="card">
+
+  <div class="row"><div><div class="eyebrow" id="detailName">等待行情</div><div class="big" id="detailPrice">--</div><div class="small muted" id="detailChange">尚未取得数据</div></div><span class="tag gray" id="detailStatus">等待数据</span></div>
+
+  <div class="chartwrap"><canvas id="chart"></canvas></div>
+
+  <div class="small muted" id="chartInfo" style="margin-top:6px">K线来源：WEEX 历史K线接口</div>
+
+  <div style="margin-top:16px;background:#f7f8fc;border-radius:14px;padding:14px">
+
+    <div class="row"><strong>EMA20 计算检查</strong><span class="tag gray" id="ema20Status">待验证</span></div>
+
+    <div class="levels">
+
+      <div class="level"><span class="small muted">EMA20</span><strong id="ema20Value">--</strong></div>
+
+      <div class="level"><span class="small muted">EMA20 独立复算</span><strong id="ema20Check">--</strong></div>
+
+    </div>
+
+    <div class="row" style="margin-top:18px"><strong>EMA50 计算检查</strong><span class="tag gray" id="ema50Status">待验证</span></div>
+
+    <div class="levels">
+
+      <div class="level"><span class="small muted">EMA50</span><strong id="ema50Value">--</strong></div>
+
+      <div class="level"><span class="small muted">EMA50 独立复算</span><strong id="ema50Check">--</strong></div>
+
+    </div>
+
+    <div class="row" style="margin-top:18px"><strong>ATR14 波动率检查</strong><span class="tag gray" id="atrStatus">待验证</span></div>
+
+    <div class="levels">
+
+      <div class="level"><span class="small muted">ATR14（价格单位）</span><strong id="atrValue">--</strong></div>
+
+      <div class="level"><span class="small muted">ATR14 独立复算</span><strong id="atrCheck">--</strong></div>
+
+      <div class="level"><span class="small muted">ATR占价格比例</span><strong id="atrPercent">--</strong></div>
+
+      <div class="level"><span class="small muted">有效已收盘K线</span><strong id="closedBars">--</strong></div>
+
+    </div>
+
+    <div class="levels">
+
+      <div class="level"><span class="small muted">K线完整性</span><strong id="dataIntegrity">待检查</strong></div>
+
+      <div class="level"><span class="small muted">固定样本测试</span><strong id="sampleTest">待测试</strong></div>
+
+    </div>
+
+    <p class="small muted" id="indicatorExplanation" style="line-height:1.8;margin:12px 0 0">点击“核验指标”进行计算、固定样本和K线完整性检查。</p>
+
+  </div>
+
+  <div class="levels">
+
+    <div class="level"><span class="small muted">昨日最高</span><strong id="yHigh">--</strong></div>
+
+    <div class="level"><span class="small muted">昨日最低</span><strong id="yLow">--</strong></div>
+
+    <div class="level"><span class="small muted">今日最高</span><strong id="tHigh">--</strong></div>
+
+    <div class="level"><span class="small muted">今日最低</span><strong id="tLow">--</strong></div>
+
+  </div>
+
+  <p class="small muted" style="line-height:1.7;margin:12px 0 0">EMA20、EMA50使用已收盘K线。ATR14使用真实波幅TR和 Wilder 平滑算法。指标通过仅表示计算检查通过，不代表行情预测准确。</p>
+
+</section>
+
+<div class="section" id="history"><h2>连接与监控状态</h2></div>
+
+<section class="card">
+
+  <div class="row"><span class="muted">行情类型</span><strong>WEEX USDT 永续</strong></div>
+
+  <div class="row" style="margin-top:13px"><span class="muted">REST 数据</span><strong id="restState">等待连接</strong></div>
+
+  <div class="row" style="margin-top:13px"><span class="muted">WebSocket</span><strong id="wsState">等待连接</strong></div>
+
+  <div class="row" style="margin-top:13px"><span class="muted">最后更新</span><strong id="lastUpdate">--</strong></div>
+
+  <div class="row" style="margin-top:13px"><span class="muted">自动交易</span><strong>未启用</strong></div>
+
+  <p class="small muted" style="line-height:1.7">页面打开时持续监控；关闭网页后监控会停止。浏览器后台可能限制连接。公共行情接口不需要 API 密钥。</p>
+
+</section>
 
 </div>
 
-<div class="mode-switch">
+<nav class="bottom"><div class="nav">
 
-  <button class="mode-btn active" id="mode-short" onclick="setMode('short')">短线（多币）</button>
+<button class="active" data-target="home"><span>⌂</span>总览</button>
 
-  <button class="mode-btn" id="mode-intra" onclick="setMode('intra')">日内（BTC/ETH/SOL）</button>
+<button data-target="coinList"><span>◫</span>行情</button>
 
-</div>
+<button data-target="detail"><span>⌁</span>图表</button>
 
-<button class="btn-main" id="start-btn" onclick="start()">▶ 开始扫描</button>
+<button data-target="history"><span>▤</span>状态</button>
 
-<div id="alert-banner" class="alert-banner" role="alert"></div>
-
-<div class="section-title">🔎 实时扫描区 <span class="muted small">（自动更新）</span></div>
-
-<div id="summary" class="card"><b>等待启动</b><div class="small muted">选择模式后点击“开始扫描”。</div></div>
-
-<div id="list"></div>
-
-<div class="section-title">⭐ 我的监控区 <span class="muted small">（手动加入，持续跟踪）</span></div>
-
-<div id="watchlist"></div>
-
-<div class="section-title">📈 历史回测（最近30天）</div>
-
-<div class="card">
-
-  <div class="small muted">仅回测当前“我的监控区”里的币种。回测会使用历史 K 线逐步生成信号，不用未来 K 线决定进场；行情接口可能限制历史数据长度。</div>
-
-  <button class="btn-secondary" id="backtest-btn" onclick="runBacktest()">▶ 回测监控币种（最近30天）</button>
-
-  <div id="backtest-summary" class="small muted">尚未运行回测</div>
-
-  <div id="backtest-results"></div>
-
-</div>
-
-<div class="section-title">🧠 策略失效复盘</div>
-
-<div id="review-area" class="card"><div class="small muted">策略失效后会自动记录原因与复盘建议；是否调整规则由你决定。</div></div>
-
-<div class="section-title">📋 历史记录</div>
-
-<div id="history"></div>
-
-<div class="footer">
-
-本版本只读取公开行情，不需要 WEEX API Key，也不会自动下单。<br>
-
-短线：1H→15M→5M（多币）　｜　日内：4H→1H→15M（仅 BTC / ETH / SOL）。没有合适点位就空仓观望。<br>
-
-监控区的价格触及止损/止盈只代表行情触及该价位，不代表真实订单成交；策略失效会留在监控区标红，需手动移除。
-
-</div>
-
-</main>
+</div></nav>
 
 <script>
 
-const REST = "https://contract-radar-proxy.2571941002.workers.dev/weex";
+"use strict";
 
-let running = false, timer = null, symbols = [];
+const $=id=>document.getElementById(id);
 
-let mode = "short", scanBusy = false, watchBusy = false;
+const DEFAULT_SYMBOLS=["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","DOGEUSDT","AVAXUSDT","SUIUSDT"];
 
-const $ = id => document.getElementById(id);
+const COLORS=["#F5A623","#6375E8","#8B6BEA","#E8B53D","#4B8EC8","#B89B3D","#E35E68","#4A9BCB"];
 
-const INTRA_SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT"];
+const INTERVAL_MS={"5m":300000,"15m":900000,"1h":3600000,"4h":14400000,"1d":86400000};
 
-const WATCH_KEY = "contract_radar_watch";
+const fmt=n=>{if(!Number.isFinite(Number(n)))return "--";n=Number(n);return n<.01?n.toFixed(6):n<1?n.toFixed(4):n<100?n.toFixed(3):n.toLocaleString("en-US",{maximumFractionDigits:2})};
 
-const HIST_KEY  = "contract_radar_hist";
+const safeNum=v=>{const n=Number(v);return Number.isFinite(n)?n:null};
 
-function loadWatch(){ try{return JSON.parse(localStorage.getItem(WATCH_KEY)||"[]")}catch{return[]} }
+const apiBase="https://api-contract.weex.com/capi/v3";
 
-function saveWatch(arr){ localStorage.setItem(WATCH_KEY, JSON.stringify(arr)) }
+const wsUrl="wss://ws-contract.weex.com/v3/ws/public";
 
-function loadHist(){ try{return JSON.parse(localStorage.getItem(HIST_KEY)||"[]")}catch{return[]} }
+let timeframe="5m",symbols=[...DEFAULT_SYMBOLS],coins=[],selected="BTCUSDT",filter="all",ws=null,wsRetry=null,wsHeartbeat=null,restTimer=null,reconnectDelay=2000,lastWsMessage=0,restBusy=false,verified=false;
 
-function saveHist(arr){ localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(0,30))) }
+function toast(message){document.querySelectorAll(".toast").forEach(x=>x.remove());const el=document.createElement("div");el.className="toast";el.textContent=message;document.body.appendChild(el);setTimeout(()=>el.remove(),2800)}
 
-function setMode(m){
+function setPill(text,kind=""){$("connection").textContent="● "+text;$("connection").className="pill "+kind}
 
-  if(m!=="short" && m!=="intra") return;
+function getCoin(s){return coins.find(c=>c.s===s)}
 
-  mode = m;
+function ensureCoin(s){let c=getCoin(s);if(!c){c={s,p:null,change:null,candles:[],daily:[],yHigh:null,yLow:null,tHigh:null,tLow:null,lastUpdate:0,loaded:false,color:COLORS[coins.length%COLORS.length]};coins.push(c)}return c}
 
-  $("mode-short").classList.toggle("active", m==="short");
+async function fetchJson(url){const r=await fetch(url,{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);return r.json()}
 
-  $("mode-intra").classList.toggle("active", m==="intra");
+function parseKlineRows(data){
 
-  if(running) runScanCycle(true);
+ if(!Array.isArray(data))throw Error("K线接口返回格式异常");
 
-}
+ return data.map(k=>({t:Number(k[0]),o:Number(k[1]),h:Number(k[2]),l:Number(k[3]),c:Number(k[4]),v:Number(k[5]),closeTime:Number(k[6])}))
 
-async function get(path){
-
-  const r = await fetch(REST + path, {cache:"no-store"});
-
-  if(!r.ok) throw Error("行情接口请求失败（HTTP "+r.status+"）");
-
-  return r.json();
+ .filter(k=>[k.t,k.o,k.h,k.l,k.c,k.v,k.closeTime].every(Number.isFinite)).sort((a,b)=>a.t-b.t);
 
 }
 
-function num(x){return Number(x)}
+async function fetchCandles(s,tf=timeframe,limit=180){return parseKlineRows(await fetchJson(apiBase+"/market/klines?symbol="+encodeURIComponent(s)+"&interval="+encodeURIComponent(tf)+"&limit="+limit))}
 
-function fmt(x){
+async function fetchDaily(s){return parseKlineRows(await fetchJson(apiBase+"/market/historyKlines?symbol="+encodeURIComponent(s)+"&interval=1d&limit=3"))}
 
-  if(x==null||!isFinite(x)) return "—";
+function dailyLevels(c){
 
-  if(Math.abs(x)>=1000) return x.toFixed(1);
+ if(!c.daily?.length)return;
 
-  if(Math.abs(x)>=10) return x.toFixed(3);
+ const start=Math.floor(Date.now()/86400000)*86400000;
 
-  return x.toFixed(5);
+ const today=c.daily.find(k=>k.t>=start),prev=[...c.daily].reverse().find(k=>k.t<start);
 
-}
-
-function sma(a,n){if(a.length<n)return null;let s=0;for(let i=a.length-n;i<a.length;i++)s+=a[i];return s/n}
-
-function atr(k,n=14){
-
-  if(k.length<n+1)return null; let trs=[];
-
-  for(let i=1;i<k.length;i++){let h=k[i].h,l=k[i].l,pc=k[i-1].c;trs.push(Math.max(h-l,Math.abs(h-pc),Math.abs(l-pc)))}
-
-  return sma(trs,n)
+ if(prev){c.yHigh=prev.h;c.yLow=prev.l}if(today){c.tHigh=today.h;c.tLow=today.l}
 
 }
 
-function trend(k){
+function closedCandles(c){
 
-  if(k.length<30)return "数据不足";
+ const now=Date.now(),duration=INTERVAL_MS[timeframe];
 
-  let c=k.map(x=>x.c), a=sma(c,9), b=sma(c,21), last=c[c.length-1];
-
-  if(a>b && last>a)return "偏多";
-
-  if(a<b && last<a)return "偏空";
-
-  return "震荡";
+ return (c.candles||[]).filter(k=>Number.isFinite(k.t)&&Number.isFinite(k.closeTime)&&k.t+duration<=now&&k.closeTime<now);
 
 }
 
-function levels(k){
+/* EMA：SMA初始化，再按标准递推公式计算。 */
 
-  let n=Math.min(40,k.length), a=k.slice(-n), hi=Math.max(...a.map(x=>x.h)), lo=Math.min(...a.map(x=>x.l));
+function calculateEMA(closes,period){
 
-  return {hi,lo};
+ if(!Array.isArray(closes)||closes.length<period||!closes.every(Number.isFinite))return null;
 
-}
+ const alpha=2/(period+1);let ema=closes.slice(0,period).reduce((a,b)=>a+b,0)/period;
 
-async function candles(sym,interval,limit=100){
+ for(let i=period;i<closes.length;i++)ema=alpha*closes[i]+(1-alpha)*ema;
 
-  const d = await get(`/capi/v3/market/klines?symbol=${encodeURIComponent(sym)}&interval=${interval}&limit=${limit}`);
-
-  const arr = Array.isArray(d)?d:(d.data||[]);
-
-  return arr.map(x=>({t:num(x[0]),o:num(x[1]),h:num(x[2]),l:num(x[3]),c:num(x[4]),v:num(x[5])})).sort((a,b)=>a.t-b.t);
+ return ema;
 
 }
 
-function suggestLeverage(sym, atrPct){
+/* EMA独立复算：将递推式展开成加权和。 */
 
-  const s = sym.replace("USDT","");
+function calculateEMAIndependent(closes,period){
 
-  if(s === "BTC" || s === "ETH") return atrPct > 1.5 ? "5～7x" : "6～8x";
+ if(!Array.isArray(closes)||closes.length<period||!closes.every(Number.isFinite))return null;
 
-  if(s === "SOL" || s === "BNB" || s === "XRP" || s === "ADA" || s === "DOGE" || s === "AVAX" || s === "LINK"){
+ const alpha=2/(period+1),decay=1-alpha;
 
-    return atrPct > 2.5 ? "3～4x" : "3～5x";
+ const seed=closes.slice(0,period).reduce((a,b)=>a+b,0)/period;
 
-  }
+ const n=closes.length-period;let out=seed*Math.pow(decay,n);
 
-  return atrPct > 3 ? "2～3x" : "2～4x";
+ for(let j=0;j<n;j++)out+=alpha*closes[period+j]*Math.pow(decay,n-1-j);
 
-}
-
-function signal(sym, price, kHigh, kMid, kLow, modeLabel){
-
-  const tH = trend(kHigh), tM = trend(kMid), L = levels(kMid), A = atr(kLow)||Math.abs(price*.005);
-
-  let dir = "观望", score = 0, entry = [null,null], sl = null, tp = [];
-
-  if(tH === "偏多" && tM === "偏多") score += 3;
-
-  else if(tH === "偏空" && tM === "偏空") score -= 3;
-
-  else return {sym,price,dir:"观望",score:0,tH,tM,entry,sl,tp,rr:"—",hi:L.hi,lo:L.lo,mode:modeLabel,lev:"—"};
-
-  if(price > L.hi * 0.998 && tM === "偏多") score += 1;
-
-  if(price < L.lo * 1.002 && tM === "偏空") score -= 1;
-
-  const need = mode === "intra" ? 4 : 3;
-
-  const atrPct = (A / price) * 100;
-
-  if(score >= need){
-
-    dir = "做多";
-
-    let e1 = Math.max(L.hi, price - A * 0.35), e2 = price;
-
-    entry = [Math.min(e1,e2), Math.max(e1,e2)];
-
-    sl = Math.min(L.lo - A * 0.25, price - A * 1.15);
-
-    if(sl >= entry[0]) sl = entry[0] - A;
-
-    let risk = entry[1] - sl;
-
-    tp = mode === "short"
-
-      ? [entry[1] + risk * 0.6, entry[1] + risk * 0.9, entry[1] + risk * 1.2]
-
-      : [entry[1] + risk * 0.8, entry[1] + risk * 1.2, entry[1] + risk * 1.6];
-
-  } else if(score <= -need){
-
-    dir = "做空";
-
-    let e1 = Math.min(L.lo, price + A * 0.35), e2 = price;
-
-    entry = [Math.min(e1,e2), Math.max(e1,e2)];
-
-    sl = Math.max(L.hi + A * 0.25, price + A * 1.15);
-
-    if(sl <= entry[1]) sl = entry[1] + A;
-
-    let risk = sl - entry[0];
-
-    tp = mode === "short"
-
-      ? [entry[0] - risk * 0.6, entry[0] - risk * 0.9, entry[0] - risk * 1.2]
-
-      : [entry[0] - risk * 0.8, entry[0] - risk * 1.2, entry[0] - risk * 1.6];
-
-  }
-
-  const rr = dir === "观望" ? "—" : (dir === "做多" ? ((tp[1]-entry[1])/(entry[1]-sl)) : ((entry[0]-tp[1])/(sl-entry[0])));
-
-  const lev = dir === "观望" ? "—" : suggestLeverage(sym, atrPct);
-
-  return {sym,price,dir,score,tH,tM,entry,sl,tp,rr,hi:L.hi,lo:L.lo,mode:modeLabel,lev};
-
-} 
-
-  
-
-async function one(sym){
-
-  let kHigh,kMid,kLow,modeLabel;
-
-  if(mode==="short"){
-
-    [kHigh,kMid,kLow]=await Promise.all([
-
-      candles(sym,"1h"),candles(sym,"15m"),candles(sym,"5m")
-
-    ]);
-
-    modeLabel="短线";
-
-  }else{
-
-    [kHigh,kMid,kLow]=await Promise.all([
-
-      candles(sym,"4h"),candles(sym,"1h"),candles(sym,"15m")
-
-    ]);
-
-    modeLabel="日内";
-
-  }
-
-  const ticker=await get(`/capi/v3/market/symbolPrice?symbol=${encodeURIComponent(sym)}`);
-
-  const price=num(ticker.price??ticker.data?.price);
-
-  return signal(sym,price,kHigh,kMid,kLow,modeLabel);
+ return out;
 
 }
 
-async function loadSymbols(){
+/* ATR的真实波幅：TR=max(H-L, |H-前收|, |L-前收|)。 */
 
-  if(mode==="intra"){symbols=[...INTRA_SYMBOLS];return;}
+function getTRs(bars){
 
-  const d=await get("/capi/v3/market/exchangeInfo");
+ const trs=[];
 
-  const a=d.symbols||(Array.isArray(d)?d:(d.data||[]));
+ for(let i=1;i<bars.length;i++){
 
-  symbols=a.map(x=>x.symbol||x.contractCode)
+  const k=bars[i],prev=bars[i-1];
 
-    .filter(Boolean).filter(s=>/USDT$/i.test(s)).slice(0,80);
+  trs.push(Math.max(k.h-k.l,Math.abs(k.h-prev.c),Math.abs(k.l-prev.c)));
 
-}
+ }
 
-async function scan(){
-
-  if(scanBusy)return;
-
-  scanBusy=true;
-
-  const scanMode=mode, scanSymbols=[...symbols];
-
-  const modeText=scanMode==="short"?"短线":"日内";
-
-  $("summary").innerHTML=`<b>🔎 ${modeText}扫描中…</b><div class="small muted">正在检查 ${scanSymbols.length} 个交易对</div>`;
-
-  try{
-
-    let out=[];
-
-    for(let i=0;i<scanSymbols.length;i+=5){
-
-      if(scanMode!==mode)return;
-
-      const batch=scanSymbols.slice(i,i+5);
-
-      const r=await Promise.allSettled(batch.map(one));
-
-      r.forEach(x=>{if(x.status==="fulfilled"&&x.value)out.push(x.value)});
-
-    }
-
-    if(scanMode!==mode)return;
-
-    out.sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
-
-    const best=out.filter(x=>x.dir!=="观望").slice(0,5);
-
-    $("summary").innerHTML=`<b>🟢 ${modeText}扫描完成</b><div class="small muted">更新时间：${new Date().toLocaleTimeString()} · 有效信号 ${best.length} 个</div>`;
-
-    if(!best.length){
-
-      $("list").innerHTML=`<div class="card empty">当前${modeText}模式没有达到标准的机会。<br>高周期与中周期必须同向，没有合适点位就空仓观望。</div>`;
-
-      return;
-
-    }
-
-    $("list").innerHTML=best.map(x=>{
-
-      const cls=x.dir==="做多"?"long":"short";
-
-      const rating=Math.abs(x.score)>=5?"S":Math.abs(x.score)>=4?"A":"B";
-
-      const already=loadWatch().some(w=>w.sym===x.sym&&w.dir===x.dir&&w.mode===x.mode);
-
-      const logicText=scanMode==="short"
-
-        ?"逻辑：高周期与中周期趋势同向 + 关键位 + 5M波动过滤。进场前等待价格进入入场区，并确认结构没有失效。"
-
-        :"逻辑：4H与1H趋势同向 + 关键位 + 15M波动过滤。适合日内持仓，进场前等待价格进入入场区，并确认结构没有失效。";
-
-      return `<div class="card">
-
-        <div class="row"><span class="coin">${x.sym}<span class="tag">${x.mode}</span></span><span class="badge ${cls}">${x.dir} · ${rating}</span></div>
-
-        <div class="price">${fmt(x.price)}</div>
-
-        <div class="grid">
-
-          <div class="box"><div class="lab">入场区</div><div class="val">${fmt(x.entry[0])} ～ ${fmt(x.entry[1])}</div></div>
-
-          <div class="box"><div class="lab">止损</div><div class="val">${fmt(x.sl)}</div></div>
-
-          <div class="box"><div class="lab">TP1</div><div class="val">${fmt(x.tp[0])}</div></div>
-
-          <div class="box"><div class="lab">TP2</div><div class="val">${fmt(x.tp[1])}</div></div>
-
-          <div class="box"><div class="lab">TP3</div><div class="val">${fmt(x.tp[2])}</div></div>
-
-          <div class="box"><div class="lab">盈亏比</div><div class="val">约 1 : ${Number(x.rr).toFixed(2)}</div></div>
-
-        </div>
-
-        <div class="lev">参考杠杆：${x.lev}（非安全保证）</div>
-
-        <div class="reason">高周期：${x.tH}　中周期：${x.tM}<br>压力：${fmt(x.hi)}　支撑：${fmt(x.lo)}<br>${logicText}</div>
-
-        ${already?'<div class="small muted" style="margin-top:8px">已在监控中</div>':`<button class="btn-add" onclick='addWatch(${JSON.stringify(x)})'>＋ 加入自选监控</button>`}
-
-      </div>`;
-
-    }).join("");
-
-  }catch(e){
-
-    $("summary").innerHTML=`<b>扫描遇到问题</b><div class="small muted">${escapeHtml(e.message||"未知错误")}，请稍后重试。</div>`;
-
-  }finally{scanBusy=false;}
+ return trs;
 
 }
 
-function addWatch(sig){
+/* Wilder ATR：前14个TR的均值作为初始ATR，之后递推平滑。 */
 
-  let list=loadWatch();
+function calculateATR(bars,period=14){
 
-  if(list.some(w=>w.sym===sig.sym&&w.dir===sig.dir&&w.mode===sig.mode))return;
+ if(!Array.isArray(bars)||bars.length<period+1)return null;
 
-  list.push({...sig,addedAt:Date.now(),status:"🟢 策略监控中",hitTP1:false,hitTP2:false,hitTP3:false,invalid:false});
+ const trs=getTRs(bars);if(trs.length<period||!trs.every(Number.isFinite))return null;
 
-  saveWatch(list);renderWatch();
+ let atr=trs.slice(0,period).reduce((a,b)=>a+b,0)/period;
 
-}
+ for(let i=period;i<trs.length;i++)atr=((period-1)*atr+trs[i])/period;
 
-function removeWatch(sym,dir,modeName){
-
-  saveWatch(loadWatch().filter(w=>!(w.sym===sym&&w.dir===dir&&w.mode===modeName)));
-
-  renderWatch();
+ return atr;
 
 }
 
-function moveToHist(item,reason){
+/* ATR独立复算：以初始ATR为种子，将Wilder递推式展开。 */
 
-  const hist=loadHist();
+function calculateATRIndependent(bars,period=14){
 
-  hist.unshift({...item,endReason:reason,endedAt:Date.now()});
+ if(!Array.isArray(bars)||bars.length<period+1)return null;
 
-  saveHist(hist);renderHist();
+ const trs=getTRs(bars);if(trs.length<period||!trs.every(Number.isFinite))return null;
 
-}
+ const seed=trs.slice(0,period).reduce((a,b)=>a+b,0)/period;
 
-function markInvalid(item,reason,price){
+ const decay=(period-1)/period,n=trs.length-period;
 
-  if(item.invalid)return;
+ let out=seed*Math.pow(decay,n);
 
-  item.invalid=true;
+ for(let j=0;j<n;j++)out+=(trs[period+j]/period)*Math.pow(decay,n-1-j);
 
-  item.invalidReason=reason;
-
-  item.invalidAt=Date.now();
-
-  item.invalidPrice=price;
-
-  item.status="🔴 策略已失效 · 请手动移除";
-
-  item.review={
-
-    reason,checkedAt:item.invalidAt,price,
-
-    suggestions:[
-
-      "检查入场时高周期与中周期是否真正同向，避免趋势切换时进场。",
-
-      "检查入场区是否靠近明显支撑或压力，是否追在行情末端。",
-
-      "对照失效前的高周期结构与 ATR 波动，评估是否需要等待收盘确认。",
-
-      "先将建议作为待验证假设；通过后续回测比较，不自动修改策略。"
-
-    ],
-
-    adopted:false
-
-  };
-
-  showAlert(`${item.sym} ${item.dir}策略失效：${reason}，当前价 ${fmt(price)}。已保留在监控区，请自行决定是否移除。`);
+ return out;
 
 }
 
-function showAlert(message){
+function runSampleTests(){
 
-  const el=$("alert-banner");
+ const data=[1,2,3,4,5],a=calculateEMA(data,3),b=calculateEMAIndependent(data,3);
 
-  el.textContent="⚠️ "+message;
+ const emaPass=Math.abs(a-4)<1e-12&&Math.abs(b-4)<1e-12;
 
-  el.classList.add("show");
+ const bars=[];
 
-}
+ for(let i=0;i<20;i++){
 
-function escapeHtml(s){
+  const close=100+i,prev=i===0?close-1:99+i;
 
-  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  bars.push({t:i*300000,o:prev,h:close+2,l:prev-1,c:close,v:1,closeTime:(i+1)*300000-1});
 
-}
+ }
 
-async function checkWatch(){
+ const atr=calculateATR(bars,14),atr2=calculateATRIndependent(bars,14);
 
-  if(watchBusy)return;
-
-  watchBusy=true;
-
-  try{
-
-    const list=loadWatch();
-
-    if(!list.length){renderWatch();return;}
-
-    let changed=false;
-
-    const endedKeys=new Set();
-
-    const keyOf=item=>`${item.sym}|${item.dir}|${item.mode||"短线"}`;
-
-    for(const item of list){
-
-      try{
-
-        const ticker=await get(`/capi/v3/market/symbolPrice?symbol=${encodeURIComponent(item.sym)}`);
-
-        const price=num(ticker.price??ticker.data?.price);
-
-        if(!Number.isFinite(price))continue;
-
-        item.price=price;item.lastCheckedAt=Date.now();changed=true;
-
-        if(item.invalid)continue;
-
-        if((item.dir==="做多"&&price<=item.sl)||(item.dir==="做空"&&price>=item.sl)){
-
-          item.status="🛑 行情触及止损价（未验证成交）";
-
-          moveToHist(item,item.status);
-
-          endedKeys.add(keyOf(item));continue;
-
-        }
-
-        if(item.dir==="做多"){
-
-          if(!item.hitTP1&&price>=item.tp[0]){item.hitTP1=true;item.status="✅ 行情触及 TP1";}
-
-          if(!item.hitTP2&&price>=item.tp[1]){item.hitTP2=true;item.status="✅ 行情触及 TP2";}
-
-          if(!item.hitTP3&&price>=item.tp[2]){
-
-            item.hitTP3=true;item.status="✅ 行情触及 TP3";
-
-            moveToHist(item,"✅ 行情触及 TP3（未验证成交）");
-
-            endedKeys.add(keyOf(item));continue;
-
-          }
-
-        }else{
-
-          if(!item.hitTP1&&price<=item.tp[0]){item.hitTP1=true;item.status="✅ 行情触及 TP1";}
-
-          if(!item.hitTP2&&price<=item.tp[1]){item.hitTP2=true;item.status="✅ 行情触及 TP2";}
-
-          if(!item.hitTP3&&price<=item.tp[2]){
-
-            item.hitTP3=true;item.status="✅ 行情触及 TP3";
-
-            moveToHist(item,"✅ 行情触及 TP3（未验证成交）");
-
-            endedKeys.add(keyOf(item));continue;
-
-          }
-
-        }
-
-        const midInterval=item.mode==="日内"?"1h":"15m";
-
-        const highInterval=item.mode==="日内"?"4h":"1h";
-
-        const [kH,kM]=await Promise.all([candles(item.sym,highInterval),candles(item.sym,midInterval)]);
-
-        const tH=trend(kH),tM=trend(kM);
-
-        if(item.dir==="做多"&&(tH==="偏空"||tM==="偏空")&&price<item.entry[0]){
-
-          markInvalid(item,"高周期或中周期转空，且价格跌破入场区",price);continue;
-
-        }
-
-        if(item.dir==="做空"&&(tH==="偏多"||tM==="偏多")&&price>item.entry[1]){
-
-          markInvalid(item,"高周期或中周期转多，且价格突破入场区",price);continue;
-
-        }
-
-        if(!item.hitTP1)item.status="🟢 策略监控中";
-
-      }catch(e){item.lastError=String(e.message||e);}
-
-    }
-
-    const remaining=list.filter(item=>!endedKeys.has(keyOf(item)));
-
-    if(changed||list.length)saveWatch(remaining);
-
-    renderWatch();
-
-  }finally{watchBusy=false;}
+ return {pass:emaPass&&Number.isFinite(atr)&&Number.isFinite(atr2)&&Math.abs(atr-atr2)<1e-10,emaPass,atrPass:Number.isFinite(atr)&&Number.isFinite(atr2)&&Math.abs(atr-atr2)<1e-10};
 
 }
 
-function renderWatch(){
+function validateCandles(bars){
 
-  const list=loadWatch();
+ const issues=[],duration=INTERVAL_MS[timeframe];let duplicates=0,gaps=0,invalid=0;
 
-  if(!list.length){
+ if(!bars.length)return {pass:false,issues:["没有可用的已收盘K线"]};
 
-    $("watchlist").innerHTML='<div class="card empty">还没有加入监控的信号。<br>在实时扫描区点“＋ 加入自选监控”。</div>';return;
+ for(let i=0;i<bars.length;i++){
 
-  }
+  const k=bars[i];
 
-  $("watchlist").innerHTML=list.map(x=>{
+  if(!(k.o>0&&k.h>0&&k.l>0&&k.c>0&&k.v>=0&&k.h>=Math.max(k.o,k.c,k.l)&&k.l<=Math.min(k.o,k.c,k.h)))invalid++;
 
-    const cls=x.dir==="做多"?"long":"short";
+  if(i){const diff=k.t-bars[i-1].t;if(diff===0)duplicates++;else if(diff>duration)gaps+=Math.max(1,Math.round(diff/duration)-1);else if(diff<duration)issues.push("发现非标准K线间隔")}
 
-    let stClass="st-ok";
+ }
 
-    if(x.invalid||(x.status||"").includes("失效")||(x.status||"").includes("止损"))stClass="st-fail";
+ if(duplicates)issues.push("重复时间戳 "+duplicates+" 处");
 
-    else if((x.status||"").includes("TP"))stClass="st-tp";
+ if(gaps)issues.push("疑似缺失K线约 "+gaps+" 根");
 
-    return `<div class="card ${x.invalid?'invalid-card':''}">
+ if(invalid)issues.push("OHLC或成交量异常 "+invalid+" 根");
 
-      <div class="row"><span class="coin">${x.sym}<span class="tag">${x.mode||"短线"}</span></span><span class="badge ${cls}">${x.dir}</span></div>
+ if(!issues.length)issues.push("当前样本未发现明显异常");
 
-      <div class="price">${fmt(x.price)}</div>
-
-      <div class="grid">
-
-        <div class="box"><div class="lab">入场区</div><div class="val">${fmt(x.entry[0])} ～ ${fmt(x.entry[1])}</div></div>
-
-        <div class="box"><div class="lab">止损</div><div class="val">${fmt(x.sl)}</div></div>
-
-        <div class="box"><div class="lab">TP1</div><div class="val">${fmt(x.tp[0])}</div></div>
-
-        <div class="box"><div class="lab">TP2</div><div class="val">${fmt(x.tp[1])}</div></div>
-
-      </div>
-
-      <div class="lev">参考杠杆：${x.lev||"—"}（非安全保证）</div>
-
-      <div class="monitor-status ${stClass}">${escapeHtml(x.status||"🟢 策略监控中")}</div>
-
-      ${x.invalid?`<div class="reason" style="color:#ff8a8a">失效原因：${escapeHtml(x.invalidReason||"策略条件不再成立")}<br>发现时间：${new Date(x.invalidAt||Date.now()).toLocaleString()}<br>失效时价格：${fmt(x.invalidPrice)}<br>该状态已锁定，不会因行情反弹自动恢复。</div>`:""}
-
-      ${x.lastError?`<div class="small muted">最近一次检查异常：${escapeHtml(x.lastError)}</div>`:""}
-
-      <div style="margin-top:10px"><button class="btn-del" onclick='removeWatch(${JSON.stringify(x.sym)},${JSON.stringify(x.dir)},${JSON.stringify(x.mode||"短线")})'>移除监控</button></div>
-
-    </div>`;
-
-  }).join("");
+ return {pass:duplicates===0&&gaps===0&&invalid===0,issues};
 
 }
 
-function renderHist(){
+function setTag(id,pass,text){$(id).textContent=text;$(id).className="tag "+(pass?"green":"red")}
 
-  const hist=loadHist();
+function verifyIndicators(c){
 
-  if(!hist.length){$("history").innerHTML='<div class="card empty">暂无历史记录</div>';return;}
+ const bars=closedCandles(c),sample=runSampleTests(),integrity=validateCandles(bars);
 
-  renderReviews();
+ $("closedBars").textContent=bars.length;
 
-  $("history").innerHTML=hist.map(x=>{
+ $("sampleTest").textContent=sample.pass?"通过":"失败";
 
-    const cls=x.dir==="做多"?"long":"short";
+ $("sampleTest").style.color=sample.pass?"var(--green)":"var(--red)";
 
-    return `<div class="card history"><div class="row"><span class="coin">${x.sym}<span class="tag">${x.mode||"短线"}</span></span><span class="badge ${cls}">${x.dir}</span></div>
+ $("dataIntegrity").textContent=integrity.pass?"未发现异常":"需检查";
 
-      <div class="small muted">入场 ${fmt(x.entry[0])}～${fmt(x.entry[1])}　止损 ${fmt(x.sl)}</div>
+ $("dataIntegrity").style.color=integrity.pass?"var(--green)":"var(--red)";
 
-      <div class="monitor-status st-fail" style="margin-top:8px">${escapeHtml(x.endReason||"已结束")}</div></div>`;
+ if(bars.length)$("emaCloseTime")&&($("emaCloseTime").textContent=new Date(bars[bars.length-1].closeTime).toLocaleString("zh-CN",{hour12:false}));
 
-  }).join("");
+ const closes=bars.map(k=>k.c);
 
-}
+ const e20=calculateEMA(closes,20),e20b=calculateEMAIndependent(closes,20);
 
-  
+ const e50=calculateEMA(closes,50),e50b=calculateEMAIndependent(closes,50);
 
-function renderReviews(){
+ const atr=calculateATR(bars,14),atrb=calculateATRIndependent(bars,14);
 
-  const invalid=loadWatch().filter(x=>x.invalid && x.review);
+ const pass20=e20!==null&&e20b!==null&&Math.abs(e20-e20b)<=Math.max(1e-10,Math.abs(e20)*1e-10);
 
-  const hist=loadHist().filter(x=>x.invalid || (x.endReason||"").includes("失效"));
+ const pass50=e50!==null&&e50b!==null&&Math.abs(e50-e50b)<=Math.max(1e-10,Math.abs(e50)*1e-10);
 
-  const all=[
+ const passATR=atr!==null&&atrb!==null&&Math.abs(atr-atrb)<=Math.max(1e-10,Math.abs(atr)*1e-10);
 
-    ...invalid,
+ $("ema20Value").textContent=e20===null?"数据不足":fmt(e20);
 
-    ...hist.filter(h=>!invalid.some(w=>w.sym===h.sym&&w.invalidAt===h.invalidAt))
+ $("ema20Check").textContent=e20b===null?"数据不足":fmt(e20b);
 
-  ].slice(0,10);
+ $("ema50Value").textContent=e50===null?"数据不足":fmt(e50);
 
-  if(!all.length){
+ $("ema50Check").textContent=e50b===null?"数据不足":fmt(e50b);
 
-    $("review-area").innerHTML='<div class="small muted">目前还没有策略失效记录。出现失效后，这里会展示原因和待验证的改进建议。</div>';
+ $("atrValue").textContent=atr===null?"数据不足":fmt(atr);
 
-    return;
+ $("atrCheck").textContent=atrb===null?"数据不足":fmt(atrb);
 
-  }
+ $("atrPercent").textContent=atr!==null&&c.p>0?(atr/c.p*100).toFixed(3)+"%":"--";
 
-  $("review-area").innerHTML=all.map((x,i)=>{
+ setTag("ema20Status",pass20,pass20?"通过":bars.length<20?"数据不足":"需检查");
 
-    const r=x.review||{
+ setTag("ema50Status",pass50,pass50?"通过":bars.length<50?"数据不足":"需检查");
 
-      reason:x.invalidReason||x.endReason||"结构条件不再成立",
+ setTag("atrStatus",passATR,passATR?"通过":bars.length<15?"数据不足":"需检查");
 
-      checkedAt:x.invalidAt||x.endedAt,
+ const all=pass20&&pass50&&passATR&&sample.pass&&integrity.pass;
 
-      price:x.invalidPrice||x.price,
+ $("indicatorState").textContent=all?"指标通过":"需检查";
 
-      suggestions:[
+ $("indicatorExplanation").textContent=
 
-        "检查高周期与中周期方向是否一致。",
+ "EMA20："+(pass20?"通过":"未通过")+"；EMA50："+(pass50?"通过":"未通过")+"；ATR14："+(passATR?"通过":"未通过")+"。"+
 
-        "检查入场位置是否接近关键支撑或压力。",
+ "固定样本："+(sample.pass?"通过":"失败")+"；K线检查："+integrity.issues.join("；")+
 
-        "检查失效前波动是否扩大，并通过回测验证改进。"
+ "。EMA使用SMA初始化；ATR使用Wilder平滑。指标核验通过不代表策略盈利，也不代表接口字段定义已被官方确认。";
 
-      ],
-
-      adopted:false
-
-    };
-
-    return `<div class="review-item">
-
-      <b>${escapeHtml(x.sym)} · ${escapeHtml(x.dir||"")}</b>
-
-      <div class="small muted">
-
-        ${r.checkedAt?new Date(r.checkedAt).toLocaleString():"时间未知"}
-
-        · 失效价 ${fmt(r.price)}
-
-      </div>
-
-      <div class="reason">失效原因：${escapeHtml(r.reason)}</div>
-
-      <ul>${r.suggestions.map(t=>`<li class="small">${escapeHtml(t)}</li>`).join("")}</ul>
-
-      <button class="btn-secondary" onclick="toggleReviewAdopt(${i})">
-
-        ${r.adopted?"已标记采纳（不自动改策略）":"标记为我准备测试的改进方向"}
-
-      </button>
-
-      <input type="hidden" id="review-id-${i}" value="${escapeHtml(x.sym)}|${escapeHtml(x.dir||"")}|${r.checkedAt||0}">
-
-    </div>`;
-
-  }).join("");
+ verified=true;return all;
 
 }
 
-function toggleReviewAdopt(index){
+function renderStats(){$("count").textContent=coins.length;$("loadedCount").textContent=coins.filter(c=>c.loaded).length}
 
-  const node=$("review-id-"+index);
+function renderCoins(){
 
-  if(!node)return;
+ const list=$("coinList");list.innerHTML="";
 
-  const [sym,dir,ts]=node.value.split("|");
+ const arr=coins.filter(c=>filter==="all"||c.loaded);
 
-  const watch=loadWatch();
+ if(!arr.length){list.innerHTML='<div class="empty">暂无已加载行情。</div>';return}
 
-  const item=watch.find(x=>
+ arr.forEach(c=>{
 
-    x.sym===sym &&
+  const el=document.createElement("div");el.className="coin";
 
-    x.dir===dir &&
+  const change=c.change==null?"等待行情":((c.change>=0?"+":"")+c.change.toFixed(2)+"%");
 
-    x.review &&
+  el.innerHTML='<div class="coinicon">'+c.s.replace("USDT","").slice(0,4)+'</div>'+
 
-    String(x.review.checkedAt)===ts
+  '<div class="coinmain"><strong>'+c.s.replace("USDT","")+' <span class="muted">/ USDT</span></strong><div class="muted">合约 · '+(c.loaded?"WEEX":"等待数据")+'</div><span class="tag '+(c.loaded?"green":"gray")+'">'+(c.loaded?"数据已加载":"等待数据")+'</span></div>'+
 
-  );
+  '<div class="price"><strong>'+(c.p==null?"--":"$"+fmt(c.p))+'</strong><small class="'+(c.change==null?"muted":c.change>=0?"green":"red")+'">'+change+'</small><button class="btn ghost" style="padding:6px 8px;margin-top:7px;font-size:10px" data-detail="'+c.s+'">查看</button></div>';
 
-  if(item){
+  list.appendChild(el);
 
-    item.review.adopted=!item.review.adopted;
+ });
 
-    saveWatch(watch);
-
-    renderReviews();
-
-    return;
-
-  }
-
-  alert("这条复盘来自历史记录；当前版本可以查看建议，但无法在历史条目上保存采纳状态。");
+ list.querySelectorAll("[data-detail]").forEach(b=>b.onclick=()=>selectCoin(b.dataset.detail,true));
 
 }
 
-function simSignalAt(sym,modeName,hi,mid,low,price){
+function renderSelect(){
 
-  const prev=mode;
+ const sel=$("detailSelect"),old=selected;sel.innerHTML=coins.map(c=>'<option value="'+c.s+'">'+c.s.replace("USDT","")+'</option>').join("");
 
-  mode=modeName==="日内"?"intra":"short";
+ if(!coins.length){sel.innerHTML='<option value="">暂无币种</option>';return}
 
-  try{
-
-    return signal(sym,price,hi,mid,low,modeName);
-
-  }finally{
-
-    mode=prev;
-
-  }
+ selected=coins.some(c=>c.s===old)?old:coins[0].s;sel.value=selected;
 
 }
 
-async function fetchBacktestCandles(sym,interval){
+function drawChart(c){
 
-  // 尝试拉取最多1000根；如果数据不足，会在界面提示实际覆盖范围。
+ const cv=$("chart"),r=cv.getBoundingClientRect();if(!r.width)return;
 
-  return candles(sym,interval,1000);
+ const d=window.devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;
+
+ const ctx=cv.getContext("2d");ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,r.width,r.height);
+
+ const w=r.width,h=r.height;
+
+ for(let i=0;i<4;i++){const yy=10+i*(h-20)/3;ctx.strokeStyle="#edf0f7";ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(w,yy);ctx.stroke()}
+
+ const candles=(c.candles||[]).slice(-80);
+
+ if(!candles.length){ctx.fillStyle="#8b94aa";ctx.font="12px sans-serif";ctx.textAlign="center";ctx.fillText("暂无真实K线数据",w/2,h/2);return}
+
+ const min=Math.min(...candles.map(k=>k.l)),max=Math.max(...candles.map(k=>k.h)),range=max-min||Math.max(max*.001,1);
+
+ const y=n=>h-12-(n-min)/range*(h-24),step=w/candles.length,body=Math.max(2,step*.56);
+
+ candles.forEach((k,i)=>{const x=i*step+step/2,up=k.c>=k.o;ctx.strokeStyle=up?"#13a779":"#ed6272";ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.moveTo(x,y(k.h));ctx.lineTo(x,y(k.l));ctx.stroke();const top=y(Math.max(k.o,k.c)),bottom=y(Math.min(k.o,k.c));ctx.fillRect(x-body/2,top,body,Math.max(1,bottom-top))});
+
+ if(c.p!=null&&c.p>=min&&c.p<=max){ctx.strokeStyle="#7187ed";ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(0,y(c.p));ctx.lineTo(w,y(c.p));ctx.stroke();ctx.setLineDash([])}
 
 }
 
-async function runBacktest(){
+function renderDetail(){
 
-  const btn=$("backtest-btn");
+ const c=getCoin(selected);if(!c){$("detailName").textContent="等待行情";$("detailPrice").textContent="--";return}
 
-  const summary=$("backtest-summary");
+ $("detailName").textContent=c.s+" · 合约";$("detailPrice").textContent=c.p==null?"--":"$"+fmt(c.p);
 
-  const results=$("backtest-results");
+ $("detailChange").textContent=c.change==null?"等待24小时涨跌数据":(c.change>=0?"+":"")+c.change.toFixed(2)+"% · WEEX";
 
-  if(btn.disabled)return;
+ $("detailChange").className="small "+(c.change==null?"muted":c.change>=0?"green":"red");
 
-  const watch=loadWatch();
+ $("detailStatus").textContent=c.loaded?"行情已加载":"等待数据";$("detailStatus").className="tag "+(c.loaded?"green":"gray");
 
-  const uniq=[
+ $("yHigh").textContent=c.yHigh==null?"--":"$"+fmt(c.yHigh);$("yLow").textContent=c.yLow==null?"--":"$"+fmt(c.yLow);
 
-    ...new Map(watch.map(x=>[x.sym+"|"+(x.mode||"短线"),x])).values()
+ $("tHigh").textContent=c.tHigh==null?"--":"$"+fmt(c.tHigh);$("tLow").textContent=c.tLow==null?"--":"$"+fmt(c.tLow);
 
-  ];
+ $("chartInfo").textContent=c.candles.length?"WEEX "+timeframe+" K线 · "+c.candles.length+" 根（指标仅使用已收盘K线）":"正在加载真实K线…";
 
-  if(!uniq.length){
-
-    summary.innerHTML='<span class="warning">请先在监控区加入至少一个币种，再运行回测。</span>';
-
-    results.innerHTML="";
-
-    return;
-
-  }
-
-  btn.disabled=true;
-
-  btn.textContent="回测进行中…";
-
-  summary.textContent="正在请求历史 K 线。若遇到 HTTP 429 会停止本轮，稍后可重试。";
-
-  results.innerHTML="";
-
-  const since=Date.now()-30*24*60*60*1000;
-
-  const feeRate=0.0006;
-
-  const slippageRate=0.0003;
-
-  const rows=[];
-
-  let anyLimited=false;
-
-  try{
-
-    for(const w of uniq){
-
-      const m=w.mode||"短线";
-
-      const modeName=m==="日内"?"日内":"短线";
-
-      const intervals=modeName==="日内"
-
-        ?["4h","1h","15m"]
-
-        :["1h","15m","5m"];
-
-      let ks;
-
-      try{
-
-        ks=await Promise.all(
-
-          intervals.map(iv=>fetchBacktestCandles(w.sym,iv))
-
-        );
-
-      }catch(e){
-
-        if(String(e.message).includes("429"))anyLimited=true;
-
-        rows.push({sym:w.sym,mode:m,error:e.message});
-
-        continue;
-
-      }
-
-      const [kh,km,kl]=ks;
-
-      if(!kh||!km||!kl||Math.min(kh.length,km.length,kl.length)<35){
-
-        rows.push({
-
-          sym:w.sym,
-
-          mode:m,
-
-          error:`历史 K 线不足（${kh?.length||0}/${km?.length||0}/${kl?.length||0} 根），无法可靠回测。`
-
-        });
-
-        continue;
-
-      }
-
-      const low=kl.filter(k=>k.t>=since);
-
-      if(low.length<30){
-
-        rows.push({
-
-          sym:w.sym,
-
-          mode:m,
-
-          error:`可用低周期 K 线仅 ${low.length} 根，无法覆盖30天；接口可能只返回最近一段数据。`
-
-        });
-
-        continue;
-
-      }
-
-      const trades=[];
-
-      let open=null;
-
-      for(let i=30;i<low.length-1;i++){
-
-        const bar=low[i];
-
-        if(bar.t<since)continue;
-
-        if(open){
-
-          const next=low[i+1];
-
-          const isLong=open.dir==="做多";
-
-          const slHit=isLong?next.l<=open.sl:next.h>=open.sl;
-
-          const tpHit=isLong?next.h>=open.tp[2]:next.l<=open.tp[2];
-
-          if(slHit||tpHit){
-
-            // 同一根K线同时触及止损和止盈时，保守地按止损处理。
-
-            const exit=slHit?open.sl:open.tp[2];
-
-            const gross=isLong
-
-              ?(exit-open.entry)/open.entry
-
-              :(open.entry-exit)/open.entry;
-
-            const net=gross-2*(feeRate+slippageRate);
-
-            trades.push({
-
-              net,
-
-              ambiguous:slHit&&tpHit,
-
-              win:net>0
-
-            });
-
-            open=null;
-
-          }
-
-          continue;
-
-        }
-
-        const duration={
-
-          "1m":60000,
-
-          "5m":300000,
-
-          "15m":900000,
-
-          "1h":3600000,
-
-          "4h":14400000
-
-        };
-
-        // 只使用当前信号K线之前已经收盘的数据，避免未来数据泄漏。
-
-        const highCut=kh.filter(
-
-          k=>k.t+duration[intervals[0]]<=bar.t
-
-        );
-
-        const midCut=km.filter(
-
-          k=>k.t+duration[intervals[1]]<=bar.t
-
-        );
-
-        const lowCut=kl.filter(
-
-          k=>k.t+duration[intervals[2]]<=bar.t
-
-        );
-
-        if(highCut.length<30||midCut.length<30||lowCut.length<15)continue;
-
-        const sig=simSignalAt(
-
-          w.sym,
-
-          modeName,
-
-          highCut,
-
-          midCut,
-
-          lowCut,
-
-          bar.c
-
-        );
-
-        if(sig.dir==="观望"||!sig.sl||!sig.tp?.length)continue;
-
-        const next=low[i+1];
-
-        const inZone=next.l<=sig.entry[1]&&next.h>=sig.entry[0];
-
-        if(!inZone)continue;
-
-        open={
-
-          dir:sig.dir,
-
-          entry:(sig.entry[0]+sig.entry[1])/2,
-
-          sl:sig.sl,
-
-          tp:sig.tp
-
-        };
-
-      }
-
-      const wins=trades.filter(t=>t.win).length;
-
-      const losses=trades.length-wins;
-
-      const net=trades.reduce((a,t)=>a+t.net,0);
-
-      const amb=trades.filter(t=>t.ambiguous).length;
-
-      rows.push({
-
-        sym:w.sym,
-
-        mode:m,
-
-        trades:trades.length,
-
-        wins,
-
-        losses,
-
-        winRate:trades.length?wins/trades.length*100:0,
-
-        net,
-
-        ambiguous:amb,
-
-        coverageDays:(low[low.length-1].t-low[0].t)/86400000
-
-      });
-
-    }
-
-    const valid=rows.filter(r=>!r.error);
-
-    const total=valid.reduce((a,r)=>a+r.trades,0);
-
-    const wins=valid.reduce((a,r)=>a+r.wins,0);
-
-    const net=valid.reduce((a,r)=>a+r.net,0);
-
-    const amb=valid.reduce((a,r)=>a+r.ambiguous,0);
-
-    summary.innerHTML=`
-
-      <b>回测完成：${total} 笔模拟交易</b>
-
-      <div class="small muted">
-
-        合计胜率：${total?(wins/total*100).toFixed(1):"—"}%
-
-        · 估算净收益率合计：${(net*100).toFixed(2)}%
-
-        · 同K线止盈止损冲突：${amb} 笔
-
-      </div>
-
-      <div class="small warning">
-
-        手续费与滑点按每边 0.06% + 0.03% 的示例值估算，往返合计0.18%。
-
-        这不是交易所对你账户的确认费率，回测也不代表实盘收益。
-
-      </div>
-
-      ${anyLimited?'<div class="warning">接口返回 HTTP 429：触发限流。请稍后重试，避免连续点击。</div>':""}
-
-      <div class="small muted">
-
-        接口最多返回1000根K线时，部分币种可能无法覆盖完整30天；
-
-        以下逐币显示实际数据覆盖情况。未完成的最后一笔交易不计入统计。
-
-      </div>
-
-    `;
-
-    results.innerHTML=rows.map(r=>{
-
-      if(r.error){
-
-        return `<div class="card">
-
-          <b>${escapeHtml(r.sym)} · ${escapeHtml(r.mode)}</b>
-
-          <div class="reason warning">
-
-            数据不足/请求失败：${escapeHtml(r.error)}
-
-          </div>
-
-        </div>`;
-
-      }
-
-      return `<div class="card">
-
-        <div class="row">
-
-          <b>${escapeHtml(r.sym)} <span class="tag">${escapeHtml(r.mode)}</span></b>
-
-          <b>${r.trades} 笔</b>
-
-        </div>
-
-        <div class="grid">
-
-          <div class="box">
-
-            <div class="lab">胜率</div>
-
-            <div class="metric">${r.winRate.toFixed(1)}%</div>
-
-          </div>
-
-          <div class="box">
-
-            <div class="lab">估算净收益率合计</div>
-
-            <div class="metric">${(r.net*100).toFixed(2)}%</div>
-
-          </div>
-
-          <div class="box">
-
-            <div class="lab">盈利 / 亏损</div>
-
-            <div class="val">${r.wins} / ${r.losses}</div>
-
-          </div>
-
-          <div class="box">
-
-            <div class="lab">同K线冲突（按止损）</div>
-
-            <div class="val">${r.ambiguous}</div>
-
-          </div>
-
-        </div>
-
-        <div class="small muted">
-
-          实际数据覆盖约 ${r.coverageDays.toFixed(1)} 天。
-
-          ${r.coverageDays<29?"未覆盖完整30天，结果仅供参考。":"接近完整30天覆盖。"}
-
-        </div>
-
-      </div>`;
-
-    }).join("");
-
-  }catch(e){
-
-    summary.innerHTML=`
-
-      <span class="warning">
-
-        回测中断：${escapeHtml(e.message||"未知错误")}。
-
-        如为 HTTP 429，请等待后重试。
-
-      </span>`;
-
-  }finally{
-
-    btn.disabled=false;
-
-    btn.textContent="▶ 回测监控币种（最近30天）";
-
-  }
+ drawChart(c);if(verified)verifyIndicators(c);
 
 }
 
-async function runScanCycle(reloadSymbols=false){
+function renderAll(){renderStats();renderCoins();renderSelect();renderDetail()}
 
-  if(!running)return;
+function selectCoin(s,scroll=false){if(!s)return;selected=s;renderSelect();$("detailSelect").value=s;renderDetail();if(scroll)$("detail").scrollIntoView({behavior:"smooth",block:"start"})}
 
-  try{
+function setStatus(c,p,change){if(p!=null&&p>0)c.p=p;if(change!=null)c.change=change;c.lastUpdate=Date.now();c.loaded=true}
 
-    if(reloadSymbols)await loadSymbols();
+function parseTicker(msg){
 
-    await scan();
+ const sym=msg.s;if(!sym)return;const c=ensureCoin(sym),data=Array.isArray(msg.d)?msg.d[0]:msg.d;if(!data)return;
 
-    await checkWatch();
+ const price=safeNum(data.c??data.lastPrice??data.last),change=safeNum(data.P??data.priceChangePercent??data.changePercent);
 
-  }catch(e){
+ if(price!=null)setStatus(c,price,change);
 
-    $("summary").innerHTML=`
+ lastWsMessage=Date.now();$("wsState").textContent="已收到实时数据";$("lastUpdate").textContent=new Date().toLocaleTimeString("zh-CN",{hour12:false});
 
-      <b>本轮更新失败</b>
-
-      <div class="small muted">
-
-        ${escapeHtml(e.message||"未知错误")}，下轮会继续尝试。
-
-      </div>`;
-
-  }
+ renderStats();renderCoins();if(c.s===selected)renderDetail();
 
 }
 
-async function start(){
+function parseKline(msg){
 
-  if(running)return;
+ const c=ensureCoin(msg.s),arr=Array.isArray(msg.d)?msg.d:[];if(!arr.length)return;
 
-  running=true;
+ const raw=arr[arr.length-1],k={t:Number(raw.t),o:Number(raw.o),h:Number(raw.h),l:Number(raw.l),c:Number(raw.c),v:Number(raw.v||0),closeTime:Number(raw.T)};
 
-  $("start-btn").textContent="⏸ 正在监控（每30秒更新）";
+ if(!Number.isFinite(k.t)||!Number.isFinite(k.c))return;
 
-  $("conn").textContent="连接中…";
+ const i=c.candles.findIndex(x=>x.t===k.t);if(i>=0)c.candles[i]=k;else c.candles.push(k);
 
-  $("conn").className="status";
+ c.candles.sort((a,b)=>a.t-b.t);c.candles=c.candles.slice(-180);setStatus(c,k.c,c.change);
 
-  try{
-
-    await loadSymbols();
-
-    $("conn").textContent="已连接";
-
-    $("conn").className="status online";
-
-    await runScanCycle(false);
-
-    if(timer)clearInterval(timer);
-
-    timer=setInterval(()=>{runScanCycle(true);},30000);
-
-  }catch(e){
-
-    running=false;
-
-    $("start-btn").textContent="▶ 开始扫描";
-
-    $("conn").textContent="连接失败";
-
-    $("conn").className="status offline";
-
-    $("summary").innerHTML=`
-
-      <b>连接失败</b>
-
-      <div class="small muted">${escapeHtml(e.message||"未知错误")}</div>`;
-
-  }
+ if(c.s===selected)renderDetail();renderCoins();
 
 }
 
-renderWatch();
+function connectWs(){
 
-renderHist();
+ clearTimeout(wsRetry);clearInterval(wsHeartbeat);try{if(ws){ws.onclose=null;ws.close()}}catch(e){}
 
-renderReviews();
+ $("wsState").textContent="正在连接…";
+
+ try{ws=new WebSocket(wsUrl)}catch(e){scheduleReconnect();return}
+
+ ws.onopen=()=>{
+
+  reconnectDelay=2000;setPill("WebSocket 已连接","ok");$("wsState").textContent="已连接，等待推送";
+
+  const params=[...new Set([...symbols.map(s=>s+"@ticker"),selected+"@kline_"+timeframe+"_LAST_PRICE"])];
+
+  ws.send(JSON.stringify({method:"SUBSCRIBE",params,id:Date.now()%1000000}));
+
+  wsHeartbeat=setInterval(()=>{if(ws&&ws.readyState===WebSocket.OPEN&&Date.now()-lastWsMessage>60000)$("wsState").textContent="连接中，暂未收到新推送"},10000);
+
+ };
+
+ ws.onmessage=e=>{
+
+  let msg;try{msg=JSON.parse(e.data)}catch(err){return}
+
+  if(msg.event==="ping"||msg.type==="ping"){try{ws.send(JSON.stringify({method:"PONG",id:1}))}catch(err){}return}
+
+  if(msg.e==="kline")parseKline(msg);
+
+  else if(["24hrTicker","ticker","24hr_ticker"].includes(msg.e))parseTicker(msg);
+
+  else if(msg.s&&msg.d)parseTicker(msg);
+
+ };
+
+ ws.onerror=()=>{$("wsState").textContent="连接错误"};ws.onclose=()=>scheduleReconnect();
+
+}
+
+function scheduleReconnect(){setPill("连接中断","err");$("wsState").textContent="连接中断，准备重连";clearTimeout(wsRetry);wsRetry=setTimeout(connectWs,reconnectDelay);reconnectDelay=Math.min(reconnectDelay*1.7,30000)}
+
+async function loadSymbol(s){
+
+ const c=ensureCoin(s);
+
+ try{const [candles,daily]=await Promise.all([fetchCandles(s,timeframe,180),fetchDaily(s)]);c.candles=candles;c.daily=daily;dailyLevels(c);const k=candles[candles.length-1];if(k&&c.p==null)c.p=k.c;c.loaded=true;return true}
+
+ catch(e){console.error("WEEX data error:",s,e);return false}
+
+}
+
+async function loadInitial(){
+
+ setPill("正在获取真实行情");$("restState").textContent="加载中…";$("scanState").textContent="加载中…";
+
+ symbols.forEach(ensureCoin);renderAll();
+
+ const results=await Promise.all(symbols.map(loadSymbol));
+
+ if(results.some(Boolean)){setPill("已获取 WEEX 数据","ok");$("restState").textContent="正常";$("notice").textContent="历史K线来自WEEX REST，实时行情来自公开WebSocket。本版本不生成交易信号。";$("scanState").textContent="已加载 "+results.filter(Boolean).length+"/"+symbols.length}
+
+ else{setPill("行情接口不可用","err");$("restState").textContent="失败";$("notice").textContent="暂时无法获取 WEEX 数据，请检查网络或接口状态。";$("scanState").textContent="加载失败"}
+
+ renderAll();connectWs();clearInterval(restTimer);restTimer=setInterval(refreshData,30000);
+
+}
+
+async function refreshData(){
+
+ if(restBusy)return;restBusy=true;
+
+ try{
+
+  await Promise.all(symbols.map(async s=>{const c=ensureCoin(s);try{const candles=await fetchCandles(s,timeframe,180);if(candles.length){c.candles=candles;if(c.p==null)c.p=candles[candles.length-1].c}c.daily=await fetchDaily(s);dailyLevels(c)}catch(e){console.warn("Refresh failed",s,e)}}));
+
+  $("restState").textContent="已尝试刷新";$("lastUpdate").textContent=new Date().toLocaleTimeString("zh-CN",{hour12:false});renderAll();
+
+ }finally{restBusy=false}
+
+}
+
+$("timeframe").onchange=()=>{timeframe=$("timeframe").value;verified=false;$("indicatorState").textContent="待验证";$("ema20Status").textContent="待验证";$("ema50Status").textContent="待验证";$("atrStatus").textContent="待验证";loadInitial()};
+
+$("detailSelect").onchange=e=>{
+
+ const previous=selected;selected=e.target.value;renderDetail();
+
+ if(ws&&ws.readyState===WebSocket.OPEN){try{ws.send(JSON.stringify({method:"UNSUBSCRIBE",params:[previous+"@kline_"+timeframe+"_LAST_PRICE"],id:Date.now()%1000000}));ws.send(JSON.stringify({method:"SUBSCRIBE",params:[selected+"@kline_"+timeframe+"_LAST_PRICE"],id:(Date.now()+1)%1000000}))}catch(e){}}
+
+ loadSymbol(selected).then(()=>{renderAll();if(verified)verifyIndicators(getCoin(selected))});
+
+};
+
+$("refreshBtn").onclick=()=>refreshData().then(()=>toast("已尝试刷新 WEEX 行情"));
+
+$("verifyBtn").onclick=()=>{const c=getCoin(selected);if(!c){toast("尚无币种数据");return}const pass=verifyIndicators(c);toast(pass?"EMA20、EMA50、ATR14及数据检查通过":"有指标或数据检查未通过，请查看详情")};
+
+$("addBtn").onclick=()=>{
+
+ const raw=prompt("输入 WEEX 交易对，例如 PEPEUSDT");if(!raw)return;
+
+ const s=raw.toUpperCase().replace(/[^A-Z0-9]/g,"");
+
+ if(!s.endsWith("USDT")||s.length<6){toast("请输入类似 ETHUSDT 的 USDT 交易对");return}
+
+ if(symbols.includes(s)){selectCoin(s,true);toast("该币已在列表中");return}
+
+ symbols.push(s);ensureCoin(s);renderAll();
+
+ loadSymbol(s).then(()=>{if(ws&&ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify({method:"SUBSCRIBE",params:[s+"@ticker"],id:Date.now()%1000000}));renderAll();toast("已尝试加载 "+s)});
+
+};
+
+$("filters").querySelectorAll("button").forEach(b=>b.onclick=()=>{filter=b.dataset.filter;$("filters").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===b));renderCoins()});
+
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x===b));$(b.dataset.target).scrollIntoView({behavior:"smooth",block:"start"})});
+
+function tickClock(){$("clock").textContent=new Date().toLocaleTimeString("zh-CN",{hour12:false})}
+
+window.addEventListener("resize",()=>{const c=getCoin(selected);if(c)drawChart(c)});
+
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){refreshData();if(!ws||ws.readyState!==WebSocket.OPEN)connectWs()}});
+
+renderAll();tickClock();setInterval(tickClock,1000);loadInitial();
 
 </script>
 
 </body>
 
 </html>
-
-  
-  
